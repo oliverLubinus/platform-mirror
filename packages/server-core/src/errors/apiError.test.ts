@@ -63,6 +63,23 @@ describe('getErrorStatusAndMessage', () => {
     strictEqual(opaque.message, JSON.stringify({ weird: true }));
     strictEqual(getErrorStatusAndMessage('plain string').message, 'plain string');
   });
+
+  it('survives a response key present but undefined/null (port fix: no TypeError)', () => {
+    deepStrictEqual(getErrorStatusAndMessage({ response: undefined }), { status: undefined, message: '{}' });
+    // null survives the guards too; the fallback serializes the whole object
+    deepStrictEqual(getErrorStatusAndMessage({ response: null }), {
+      status: undefined,
+      message: '{"response":null}'
+    });
+  });
+
+  it('falls back to String() for circular structures instead of throwing (port fix)', () => {
+    const circular: Record<string, unknown> = {};
+    circular.self = circular;
+    const result = getErrorStatusAndMessage(circular);
+    strictEqual(typeof result.message, 'string');
+    strictEqual(result.message, '[object Object]');
+  });
 });
 
 describe('buildErrorDetails (fail-closed sanitization)', () => {

@@ -126,26 +126,43 @@ export function getErrorStatusAndMessage(err: unknown): {
   let message = '';
   if (typeof err === 'object' && err !== null) {
     const e = err as ErrorWithStatus;
+    // `in` checks pass even when the key holds undefined/null — access must
+    // be null-guarded or this "robust extraction" helper itself throws
+    // (error-in-error-handler). Port fix: e.response null-guards added.
     if ('status' in e && typeof e.status !== 'undefined') {
       status = e.status;
-    } else if ('response' in e && typeof e.response.status !== 'undefined') {
+    } else if ('response' in e && e.response != null && typeof e.response.status !== 'undefined') {
       status = e.response.status;
     } else if ('code' in e && typeof e.code !== 'undefined') {
       status = e.code;
     }
     if ('message' in e && typeof e.message === 'string') {
       message = e.message;
-    } else if ('response' in e && e.response.data?.error?.message) {
+    } else if ('response' in e && e.response != null && e.response.data?.error?.message) {
       message = e.response.data.error.message ?? '';
     } else {
-      message = JSON.stringify(err);
+      message = stringifySafely(err);
     }
   } else if (typeof err === 'string') {
     message = err;
   } else {
-    message = String(err);
+    message = stringifySafely(err);
   }
   return { status, message };
+}
+
+/**
+ * JSON.stringify that never throws (circular structures) and never yields
+ * `undefined` (functions/symbols serialize to undefined). Port fix: the
+ * original fell back to a bare `JSON.stringify(err)`.
+ */
+function stringifySafely(value: unknown): string {
+  try {
+    const serialized = JSON.stringify(value);
+    return serialized ?? String(value);
+  } catch {
+    return String(value);
+  }
 }
 
 /**
