@@ -12,6 +12,31 @@ implementation** — not re-invented.
 | `errors/sanitize` | `auth-provider/backend/src/shared/sanitizeLogMeta.ts` (verbatim port) | R-PKG-08: no secrets/tokens/PII in logs — fail-closed redaction |
 | `events/eventConsumer` | Derived from ADR-016 §3 + R-CHAT-21/22/23/24 | The only platform-conformant consumer; R-CHAT-21: "no hand-rolled consumers" |
 | `config/provider` (secretProvider convention) | `auth-provider/backend/src/config/secretProvider.ts` pattern | ADR-010; R-ENV-03 env-file conventions; Q9: interface is the decision, product deferred |
+| `logging/logger` | `auth-provider/backend/src/shared/logger.ts` | T1.3b; interface + zero-dep impl; ONE redaction via `sanitizeLogMeta`; transport wiring stays app-side |
+| `errors/handler` + `express/adapter` | `auth-provider/backend/src/shared/globalErrorHandler.ts` | T1.3c; classifier core (zero-dep) + `@platform/server-core/express` subpath (types-only, express optional peer) |
+
+## Port audit (drift verification — 2026-11-06)
+
+Source snapshot: **auth-provider @ `1cc2f64`**. Status per module: `errors/sanitize.ts`
+verbatim; `apiError.ts` ported + defect fixes; `errorCodes.ts` generalized to the
+open-world registry; `handler.ts`/`adapter.ts` generalized; `logger.ts` restructured;
+`eventConsumer.ts` spec-first template (ADR-016); `config/provider.ts` pattern port.
+
+Verified divergences (each documented in the module's header comment):
+
+1. **Envelope**: live `toApiErrorObject()` returns `{code, message, details?}` — no
+   `status` (verified against `1cc2f64`). Platform envelope includes `status`
+   (integration contract §3); auth-provider keeps its shape.
+2. **Redaction drift, fixed at the source**: live `logger.ts` carries its own
+   redaction copy (lowercase matching, key set lacking `email`/`apiKey`) alongside
+   `sanitizeLogMeta.ts` (which redacts `email`). The platform logger redacts
+   through the ported `sanitizeLogMeta` only — one implementation, one key set.
+3. **Port fixes**: live `getErrorStatusAndMessage` throws on `{response: undefined}`,
+   `{response: null}` and circular structures (reproduced 2026-11-06); the platform
+   version null-guards and uses a safe stringify fallback.
+4. **Error handler**: branch-2 status comes from the app registry (the live handler
+   hardcodes LLM mappings); Zod → `VALIDATION_FAILED`/422 (live: `INVALID_REQUEST`/400);
+   stacks go to server-side logs only — the live handler echoed dev stacks to clients.
 
 ## Deliberately NOT ported (stay app-side)
 
@@ -19,8 +44,10 @@ implementation** — not re-invented.
   retains it; generalization awaits a second consumer (ADR-010 discipline).
 - auth-provider's specific secret inventory — apps declare their own
   (`AppSecretSpec[]`); the engine is here, the inventory is per-app.
-- Express adapters (error-handler middleware, route wiring) — land with
-  `@platform/app-template` (T1.5), keeping this package framework-agnostic.
+- Transport wiring for the logger (winston + daily rotation) and app route
+  wiring — land with `@platform/app-template` (T1.5). The Express error
+  adapter itself DID land as a types-only subpath (`@platform/server-core/express`)
+  with express as an optional peer — no runtime dependency enters this package.
 
 ## Usage sketch (new platform backend)
 
