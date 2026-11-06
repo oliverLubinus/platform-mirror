@@ -1,9 +1,10 @@
 packages:
   - 'packages/*'
 
-# pnpm >= 10 reads build-script approvals HERE (the legacy `pnpm` field in
-# package.json is no longer read — see pnpm.io/settings). esbuild ships a
-# postinstall step (its binary-check script); tsx depends on it. Without
-# this allow-list, CI fails with ERR_PNPM_IGNORED_BUILDS.
-onlyBuiltDependencies:
-  - esbuild
+# pnpm 11+ REPLACED onlyBuiltDependencies/neverBuiltDependencies with this
+# allowBuilds map (the legacy `pnpm` field in package.json was dropped even
+# earlier). strictDepBuilds defaults to true: an unreviewed build script
+# fails the install with ERR_PNPM_IGNORED_BUILDS. esbuild ships a postinstall
+# step (binary-check script); tsx depends on it.
+allowBuilds:
+  esbuild: true
