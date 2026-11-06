@@ -1,0 +1,30 @@
+{
+  "name": "@platform/server-core",
+  "version": "0.1.0",
+  "description": "Platform-wide backend baseline (ADR-010 extraction): error contract, sanitization, event-consumer template, secretProvider engine. Ported from the live auth-provider implementation.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/errors/apiError.test.ts src/errors/errorCodes.test.ts src/errors/sanitize.test.ts src/events/eventConsumer.test.ts src/secrets/secretProvider.test.ts",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
