@@ -53,3 +53,19 @@ export type { Logger, LogLevel, LogMeta, StructuredLogEvent, LoggerOptions } fro
 // `@platform/server-core/express` subpath, NOT in this barrel.
 export { classifyError, sanitizeDetailsForClient } from './errors/handler.js';
 export type { ErrorHandlerContext, ErrorClassification } from './errors/handler.js';
+
+// Audit hook (T1.3d): single choke point, GDR-2 row-integrity stamping,
+// ABE-5 redaction, fail-open/fail-closed. Persistence is injected.
+export { createAuditLogger } from './audit/auditLog.js';
+export type { AuditEntry, AuditFailureMode, AuditLogger, AuditLoggerOptions } from './audit/auditLog.js';
+export { createRowIntegrity } from './audit/rowIntegrity.js';
+export type {
+  RowIntegrity,
+  IntegrityTable,
+  IntegrityStatus,
+  RowIntegrityFields,
+  UserIntegrityFields,
+  LogIntegrityFields,
+  AnchorIntegrityFields
+} from './audit/rowIntegrity.js';
+export { redactAuditDetails } from './audit/auditRedaction.js';
