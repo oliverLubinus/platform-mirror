@@ -2,6 +2,15 @@
   "name": "@platform/server-core",
   "version": "0.1.0",
   "description": "Platform-wide backend baseline (ADR-010 extraction): error contract, sanitization, event-consumer template, secretProvider engine. Ported from the live auth-provider implementation.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oliverLubinus/platform.git",
+    "directory": "packages/server-core"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

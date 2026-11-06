@@ -7,7 +7,9 @@ pinning majors (N/N-1 policy).
 
 **Status: T1 seed (Phase 0 of the implementation plan — living DoD tracker
 lives there).** server-core v0.1 is implemented and tested; auth-client and
-app-template are scoped placeholders.
+app-template are scoped placeholders. Release-train publish/consume
+config is in place (T1.2); the first publish awaits the namespace
+prerequisite recorded in docs/release-train.md.
 
 ## Structure (ADR-012 §1)
 
@@ -32,7 +34,7 @@ follows the first consumer needing each — ADR-010 §4 discipline).
   fork package code locally — needs go through this repo.
 - **Release train:** coordinated `@platform/*` releases (Changesets);
   every release gets a changelog; breaking changes require a major bump
-  and a decision-record reference.
+  and a decision-record reference. Runbook: docs/release-train.md.
 - **Dependency direction:** apps depend on `@platform/*` and platform
   services' APIs — never the reverse (enforced via layering checks as
   they materialize).
@@ -44,6 +46,8 @@ pnpm install          # workspace install (frozen lockfile in CI)
 pnpm typecheck        # tsc --noEmit per package
 pnpm test             # node:test per package
 pnpm build            # tsc emit per package
+pnpm changeset        # add a changeset (required for any package version change)
+pnpm release          # changeset publish (CI does this; local use = manual)
 ```
 
 Requires Node ≥ 24 (native TS type-stripping runs the tests; builds emit

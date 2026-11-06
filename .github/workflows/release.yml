@@ -1,0 +1,70 @@
+name: release
+
+# Release train (ADR-012 §2): coordinated `@platform/*` releases via Changesets.
+#
+# Flow: a PR adds a changeset (`pnpm changeset`) -> merge -> this workflow opens/
+# updates the "Version Packages" PR -> that PR merges -> the same workflow runs
+# `changeset publish`, which publishes every package whose version is ahead of
+# the registry and pushes the per-package git tags.
+#
+# The job is inert until the repo lives under the account that owns the
+# `@platform` npm scope (ADR-012 resolved 2026-11-06: GitHub Packages requires
+# scope == owning GitHub account). See docs/release-train.md for the
+# one-time prerequisites and the initial-publish runbook.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write      # version commit + per-package release tags
+  pull-requests: write # "Version Packages" PR
+  packages: write      # GitHub Packages publish
+
+jobs:
+  release-train:
+    # Self-arming guard: runs only once the namespace precondition is met
+    # (repo transferred to the `platform` account). Before that, publishing
+    # `@platform/*` from GitHub Packages is impossible and the job must not
+    # even attempt it.
+    if: github.repository_owner == 'platform'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # changesets needs history/tags for versioning
+
+      - uses: pnpm/action-setup@v4
+        # version resolved from package.json "packageManager"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          # Writes the user-level ~/.npmrc auth line for GitHub Packages from
+          # NODE_AUTH_TOKEN. (pnpm deliberately ignores repo-level env-var
+          # auth tokens — no token line lives in the committed .npmrc.)
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      # Same gates as ci.yml — the train never publishes unverified code.
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+
+      - uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          title: 'chore(release): version packages'
+          commit: 'chore(release): version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN has packages:write for this repo -> valid publish
+          # credential for GitHub Packages (no PAT bootstrap in CI, R-ENV-03).
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
