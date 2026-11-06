@@ -14,6 +14,9 @@ implementation** — not re-invented.
 | `config/provider` (secretProvider convention) | `auth-provider/backend/src/config/secretProvider.ts` pattern | ADR-010; R-ENV-03 env-file conventions; Q9: interface is the decision, product deferred |
 | `logging/logger` | `auth-provider/backend/src/shared/logger.ts` | T1.3b; interface + zero-dep impl; ONE redaction via `sanitizeLogMeta`; transport wiring stays app-side |
 | `errors/handler` + `express/adapter` | `auth-provider/backend/src/shared/globalErrorHandler.ts` | T1.3c; classifier core (zero-dep) + `@platform/server-core/express` subpath (types-only, express optional peer) |
+| `audit/rowIntegrity` | `auth-provider/backend/src/utils/rowIntegrity.ts` | T1.3d; GDR-2 digests (3-state verify, timing-safe); GENERALIZED: HMAC key injected via factory (config composition is app-side) |
+| `audit/auditLog` + `audit/auditRedaction` | `auth-provider/backend/src/utils/auditLog.ts` + `auditRedaction.ts` | T1.3d; single audit choke point with digest-over-redacted-details, fail-open/closed; GENERALIZED: persistence injected (Prisma stays app-side); redaction regex VERBATIM — boundary semantics pinned in tests |
+| `express/rateLimiter` + `express/securityHeaders` + `express/auth` | `auth-provider/backend/src/shared/RateLimiterNode.ts` + `middleware/securityHeaders.ts` + `utils/auth.ts` | T1.3d; policy wrapper over express-rate-limit ^8.5.1 (optional peer, GDR-4 carried over), H-04 headers verbatim, F-031 header-only token extraction; TokenVerifier contract is spec-first (real JWKS verifier lands with app-template) |
 
 ## Port audit (drift verification — 2026-11-06)
 
