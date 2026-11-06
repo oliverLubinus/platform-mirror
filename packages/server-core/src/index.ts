@@ -44,3 +44,12 @@ export type {
 // secretProvider convention (ADR-010 / R-ENV-03)
 export { loadSecretFile, loadAppSecrets, SecretProviderError } from './config/provider.js';
 export type { AppSecretSpec, AppSecrets } from './config/provider.js';
+
+// Logging contract + zero-dep default implementation (T1.3b)
+export { createLogger } from './logging/logger.js';
+export type { Logger, LogLevel, LogMeta, StructuredLogEvent, LoggerOptions } from './logging/logger.js';
+
+// Error classifier core (T1.3c) — the Express adapter lives at the
+// `@platform/server-core/express` subpath, NOT in this barrel.
+export { classifyError, sanitizeDetailsForClient } from './errors/handler.js';
+export type { ErrorHandlerContext, ErrorClassification } from './errors/handler.js';
