@@ -1,0 +1,22 @@
+# Local dev environment (R-ENV-01: dev = docker-compose per repo, synthetic data).
+# The db service is the only stateful piece; server and client run on the host
+# via `pnpm dev:server` / `pnpm dev:client` (Vite proxies /api to the server).
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      - "54329:5432"
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  app-db-data:

@@ -1,0 +1,44 @@
+{
+  "name": "@platform/app-template",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The agent onboarding kit: Vite + TS + React 19 client, Express + Prisma + PostgreSQL server, @platform/server-core pre-wired (R-PKG-09). Scaffold a new app from this template; this manifest is renamed by scripts/scaffold.mjs.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:server": "tsx watch template/server/src/index.ts --env-file=template/.env",
+    "dev:client": "vite template/client",
+    "typecheck": "tsc -p template/server/tsconfig.json --noEmit && tsc -p template/client/tsconfig.json --noEmit",
+    "test": "node --import tsx --test template/server/src/app.test.ts",
+    "build": "tsc -p template/server/tsconfig.build.json && vite build template/client",
+    "db:up": "docker compose -f template/docker-compose.yml up -d db",
+    "db:down": "docker compose -f template/docker-compose.yml down",
+    "db:generate": "prisma generate --schema template/server/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema template/server/prisma/schema.prisma",
+    "db:seed": "tsx template/server/prisma/seed.ts --env-file=template/.env"
+  },
+  "dependencies": {
+    "@platform/server-core": "workspace:*",
+    "@prisma/client": "^6.19.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "prisma": "^6.19.0",
+    "supertest": "^7.1.0",
+    "@types/supertest": "^6.0.3",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.2.0"
+  }
+}

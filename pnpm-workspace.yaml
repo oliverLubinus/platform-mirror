@@ -8,3 +8,6 @@ packages:
 # step (binary-check script); tsx depends on it.
 allowBuilds:
   esbuild: true
+  prisma: true
+  "@prisma/client": true
+  "@prisma/engines": true

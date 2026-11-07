@@ -1,0 +1,26 @@
+// The platform DB standard (backlog item 4, codified here per R-PKG-09):
+// one schema per service, migrations are the ONLY path to a schema change
+// (`prisma migrate dev` locally, `prisma migrate deploy` in staging/prod —
+// never `db push` outside throwaway experiments), the generated client is
+// never committed, and seeds carry SYNTHETIC data only (R-ENV-01).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Synthetic demo model — delete it with your app's first real migration.
+/// Demonstrates the conventions: cuid ids, explicit createdAt/updatedAt,
+/// and comment-as-documentation.
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notes")
+}

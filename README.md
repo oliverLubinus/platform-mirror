@@ -18,7 +18,7 @@ packages/
   server-core/     error contract, sanitization, event-consumer template,
                    secretProvider engine (v0.1 — ported from live auth-provider)
   auth-client/     frontend auth SDK (T1.4 — implemented: OIDC Auth Code + PKCE core, port audit in its README)
-  app-template/    reference scaffold (T1.5 — placeholder)
+  app-template/    reference scaffold (T1.5 — in progress - T1.5a skeleton landed)
 infra/
   gateway/         nginx config per environment (T1.6 migration target)
   monitoring/      Prometheus/Loki/Grafana config (T1.6 migration target)
