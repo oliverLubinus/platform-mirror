@@ -170,6 +170,18 @@ importers:
         specifier: ^2.29.0
         version: 2.31.1(@types/node@24.19.2)
 
+  packages/auth-client:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.19.2
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.15
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
   packages/server-core:
     devDependencies:
       '@types/express':

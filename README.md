@@ -6,8 +6,8 @@ versioned npm packages from **GitHub Packages** (resolved 2026-11-05),
 pinning majors (N/N-1 policy).
 
 **Status: T1 seed (Phase 0 of the implementation plan — living DoD tracker
-lives there).** server-core v0.1 is implemented and tested; auth-client and
-app-template are scoped placeholders. Release-train publish/consume
+lives there).** server-core v0.1 and auth-client v0 are implemented and
+tested; app-template remains a scoped placeholder. Release-train publish/consume
 config is in place (T1.2); the first publish awaits the namespace
 prerequisite recorded in docs/release-train.md.
 
@@ -17,7 +17,7 @@ prerequisite recorded in docs/release-train.md.
 packages/
   server-core/     error contract, sanitization, event-consumer template,
                    secretProvider engine (v0.1 — ported from live auth-provider)
-  auth-client/     frontend auth SDK (T1.4 — placeholder)
+  auth-client/     frontend auth SDK (T1.4 — implemented: OIDC Auth Code + PKCE core, port audit in its README)
   app-template/    reference scaffold (T1.5 — placeholder)
 infra/
   gateway/         nginx config per environment (T1.6 migration target)
