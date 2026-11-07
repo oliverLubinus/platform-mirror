@@ -1,0 +1,168 @@
+# OpenAPI 3.0.3 — CONTRACT-FIRST (R-PKG-11): every backend publishes a spec
+# for ALL HTTP endpoints, validated against the implementation in CI (spec
+# drift fails the build). The validation is openapi.test.ts, which checks
+# this file against the route MANIFEST (server/src/routes.ts) — add both or
+# neither. Security: bearerAuth = auth-provider access tokens (ADR-004).
+openapi: 3.0.3
+info:
+  title: '{{APP_TITLE}} API'
+  version: 0.1.0
+  description: >-
+    Platform contract-first API. All error responses use the platform error
+    envelope ({ error: { code, message, status, details? } }).
+servers:
+  - url: http://localhost:8080
+    description: Local development
+tags:
+  - name: system
+  - name: notes
+paths:
+  /api/health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      summary: Liveness probe (DB-free by design)
+      security: []
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/notes:
+    get:
+      tags: [notes]
+      operationId: listNotes
+      summary: List the authenticated user's notes
+      description: 'Requires a valid access token. Permission (ADR-007): app-template.notes:read.'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notes (newest first, capped)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+    post:
+      tags: [notes]
+      operationId: createNote
+      summary: Create a note
+      description: 'Requires a valid access token. Permission (ADR-007): app-template.notes:write.'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNoteInput'
+      responses:
+        '201':
+          description: Note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteMutationResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'auth-provider access token (Authorization: Bearer <token>)'
+  responses:
+    Unauthorized:
+      description: Missing, invalid, or expired access token (reasons are NOT leaked to callers)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlatformError'
+    RateLimited:
+      description: Rate-limit budget exhausted (standard RateLimit-* headers accompany this)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlatformError'
+  schemas:
+    PlatformError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, status]
+          properties:
+            code:
+              type: string
+              description: Stable machine-readable error code (registry §3)
+              example: UNAUTHENTICATED
+            message:
+              type: string
+            status:
+              type: integer
+            details:
+              description: Optional structured details (sanitized request context, validation info)
+    HealthResponse:
+      type: object
+      required: [ok, uptime]
+      properties:
+        ok:
+          type: boolean
+        uptime:
+          type: number
+          description: Process uptime in seconds
+    Note:
+      type: object
+      required: [id, title, body, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    NotesResponse:
+      type: object
+      required: [notes]
+      properties:
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+    CreateNoteInput:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+    NoteMutationResponse:
+      type: object
+      required: [note]
+      properties:
+        note:
+          $ref: '#/components/schemas/Note'

@@ -1,0 +1,1 @@
+{"description": "Design-token guard baseline ratchet (ported from auth-provider, T1.5c). Files listed here carry LEGACY raw-color violations tolerated until the migration prunes them. New files can never be added; the baseline only ever shrinks. The template starts with the ratchet fully CLOSED: every file consumes the semantic tokens from src/styles/tokens.css.", "files": []}

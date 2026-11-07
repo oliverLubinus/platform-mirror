@@ -7,6 +7,40 @@
  *   staging, R-ENV-01).
  */
 
+import type { IssuerKey } from '@platform/server-core';
+
+/**
+ * Parse the issuer key ring (JWT_SIGNING_KEYS env - the SAME value the
+ * issuer deploys with). Fail closed on malformed JSON: a hand-edited or
+ * truncated key ring must refuse to start, not degrade to a broken
+ * verifier (same discipline as the issuer own parseJwtSigningKeys).
+ */
+function parseSigningKeys(raw: string | undefined): IssuerKey[] {
+  const value = raw ?? process.env['JWT_SIGNING_KEYS'];
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error('CONFIG_INVALID: JWT_SIGNING_KEYS is required (JSON array of { kid, secret })');
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    throw new Error('CONFIG_INVALID: JWT_SIGNING_KEYS is not valid JSON');
+  }
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error('CONFIG_INVALID: JWT_SIGNING_KEYS must be a non-empty array');
+  }
+  return parsed.map((entry, index) => {
+    if (typeof entry !== 'object' || entry === null) {
+      throw new Error(`CONFIG_INVALID: JWT_SIGNING_KEYS[${index}] is not an object`);
+    }
+    const { kid, secret } = entry as { kid?: unknown; secret?: unknown };
+    if (typeof kid !== 'string' || kid.length === 0 || typeof secret !== 'string' || secret.length === 0) {
+      throw new Error(`CONFIG_INVALID: JWT_SIGNING_KEYS[${index}] needs non-empty kid and secret`);
+    }
+    return { kid, secret };
+  });
+}
+
 export interface AppConfig {
   nodeEnv: 'development' | 'production' | 'test';
   port: number;
@@ -15,6 +49,12 @@ export interface AppConfig {
   rateLimitMax: number;
   rateLimitWindowMs: number;
   auditHmacKey: string;
+  /** OIDC issuer URL (ISSUER_URL) - expected iss claim, normalized. */
+  issuerUrl: string;
+  /** Registered client id - expected aud claim on access tokens. */
+  audience: string;
+  /** The issuer signing key ring (rotation-aware; shared per environment). */
+  jwtSigningKeys: IssuerKey[];
 }
 
 function required(env: NodeJS.ProcessEnv, key: string): string {
@@ -49,6 +89,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     rateLimitWindowMs: int(env, 'RATE_LIMIT_WINDOW_MS', 60000),
     // Dev-only interim; real deploys read the key via the secretProvider
     // convention (R-ENV-03, loadAppSecrets) — see README §Secrets.
+    issuerUrl: required(env, 'ISSUER_URL'),
+    audience: required(env, 'AUTH_AUDIENCE'),
+    jwtSigningKeys: parseSigningKeys(env['JWT_SIGNING_KEYS']),
     auditHmacKey: required(env, 'AUDIT_HMAC_KEY'),
   };
 }

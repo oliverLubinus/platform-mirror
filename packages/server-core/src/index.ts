@@ -69,3 +69,10 @@ export type {
   AnchorIntegrityFields
 } from './audit/rowIntegrity.js';
 export { redactAuditDetails } from './audit/auditRedaction.js';
+
+// Real access-token verifier (T1.5c) - HS256 key-ring verification of
+// auth-provider-issued JWTs; replaces the fail-closed default verifier.
+export {
+  createTokenVerifier
+} from './tokenVerifier.js';
+export type { IssuerKey, TokenVerifierConfig } from './tokenVerifier.js';

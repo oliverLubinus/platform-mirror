@@ -1,6 +1,6 @@
 # @platform/app-template
 
-**Status: T1.5 in progress (skeleton phase landed — see the build order below).**
+**Status: T1.5c landed (real token verifier + contract-first CI + guardrail suite — see the build order below).**
 
 The **agent onboarding kit**: the reference scaffold every platform app starts from (R-PKG-09). One agent per repo (ADR-012): scaffold a new repo from here, never fork an existing app.
 
@@ -9,7 +9,7 @@ The **agent onboarding kit**: the reference scaffold every platform app starts f
 | Concern | Mechanism |
 | --- | --- |
 | Error contract | `@platform/server-core` global error handler + platform envelope (`{ error: { code, message, status } }`); app registry extends `PLATFORM_ERROR_CODES` |
-| Security | H-04 security headers, `no-store` on APIs, rate limiting with envelope 429, `requireAuth` **fail-closed** (real JWKS verifier = T1.5c) |
+| Security | H-04 security headers, `no-store` on APIs, rate limiting with envelope 429, `requireAuth` with the **real HS256 verifier** (server-core `createTokenVerifier`: key-ring rotation, alg pinning, iss/aud/exp contract) |
 | Logging hygiene | URLs pass `sanitizeUrlQuery` before any sink; secrets/tokens never logged (R-PKG-08) |
 | Audit | `createAuditLogger` wired at the factory; persistence is injected per app (ADR-011) |
 | DB standard | **Prisma** (backlog item 4, codified in `server/prisma/schema.prisma` header): migrations are the only path to a schema change; synthetic seed (R-ENV-01) |
@@ -69,9 +69,11 @@ each one is pinned by a test in `template/client/src/auth/authClient.test.ts`.
 2. `cp template/.env.example template/.env` and fill the three `VITE_*`
    vars. Cold loads then pass through the hosted-UI redirect dance: silent
    while the staging session lives, hosted login when it does not.
-3. The server stays FAIL-CLOSED until the real token verifier lands
-   (T1.5c) — authenticated users see the curated "not verified yet" note
-   state, not an error loop.
+3. The server verifies tokens with the ISSUER key ring (T1.5c): set
+   `ISSUER_URL`, `AUTH_AUDIENCE`, and `JWT_SIGNING_KEYS` (the same key-ring
+   JSON the issuer deploys with — shared per environment, rotation-aware
+   via `kid`). Authenticated users see their notes; tampered/stale tokens
+   get the generic 401 envelope with no reason leakage.
 ## Scaffold a new app
 
 ```bash
@@ -88,9 +90,9 @@ pnpm dev:client   # terminal 2 (:5173, /api proxied to :8080)
 
 - [x] **T1.5a** skeleton: client/server layout, server-core pre-wired, Prisma standard, compose dev env, CI mirror, scaffold script
 - [x] **T1.5b** i18n skeleton completion + auth-client as first real consumer (login/callback/ensureSession/authenticatedFetch) — feeds the `./react` adapter design (ADR-020 Phase 2) *(done: the wiring owns a single-flight boot state machine + the loop-safe 401 policy; 15 consumer tests pin the full OIDC dance through the SDK - single-flight boot, returnTo-out-of-URL, PKCE verifier on the exchange, single-use state, access_denied surfacing, refresh+retry with the new Bearer, CSRF double-submit logout, local-clear-guaranteed sign-out; findings F1-F5 recorded in the README as the adapter-design input; no hardcoded literals - every auth/callback string centralized per backlog item 6)*
-- [ ] **T1.5c** OpenAPI contract-first CI (R-PKG-11), permission-catalog check (ADR-007), pre-commit suite port (whitespace, design tokens, contrast, layering, bundle-secrets), real JWKS verifier (replaces the fail-closed stub in server-core)
+- [x] **T1.5c** OpenAPI contract-first CI (R-PKG-11), permission-catalog check (ADR-007), pre-commit suite port (whitespace, design tokens, contrast, layering, bundle-secrets), real token verifier (replaces the fail-closed stub) *(done: the REAL verifier is server-core `createTokenVerifier` — reality-check divergence: the live issuer signs HS256 with a shared key ring and deliberately omits `jwks_uri` from discovery, so the verifier consumes the issuer key ring (`JWT_SIGNING_KEYS` + `kid` rotation) instead of a JWKS endpoint; RS256+JWKS stays the T4.1 upgrade path as a drop-in fetch mode on the same `TokenVerifier` contract. 17 verifier tests incl. signature round-trips; routes mount FROM a manifest that binds implementation ↔ `openapi.yaml` ↔ permission catalog, with a bidirectional spec-drift gate (6 tests) and the ADR-007 catalog lint (5 tests) failing the build on any of the three; the pre-commit guardrail suite (5 scripts + eslint flat config + quality-gate composition + hook installer) is ported and generalized to Vite — the hooks layer (src/hooks owns api imports) and the audited token palette (19 pairs × 2 schemes WCAG AA) are seeded so the ratchets start fully closed; `pnpm check:quality-gate` runs all nine stages green)*
 - [ ] **T1.5d** AGENTS.md scaffold (T2.1: mission, requirement-ID map, never-build list, escalation rule) + onboarding rehearsal
 
 ## Development (inside the platform monorepo)
 
-The template is a normal workspace package while it evolves: `pnpm --filter @platform/app-template typecheck|test|build`. Server unit tests are DB-free by design (lazy Prisma import); DB-backed integration tests arrive with the contract CI job (T1.5c).
+The template is a normal workspace package while it evolves: `pnpm --filter @platform/app-template typecheck|test|build`. Server unit tests are DB-free by design (lazy Prisma import + injected store); DB-backed integration tests arrive with the contract CI job. Run the local guardrails: `pnpm check:quality-gate` (whitespace, tokens, contrast, layering, lint, typecheck, tests, build, bundle-secret scan) and `pnpm hooks:install` for the pre-commit fast path.

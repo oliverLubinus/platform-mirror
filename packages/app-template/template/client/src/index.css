@@ -1,0 +1,43 @@
+@import './styles/tokens.css';
+
+/* Base: token-driven by default (whitespace/token guards apply to source). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+}
+
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.375rem;
+  background: var(--surface);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--surface-hover);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+h1,
+h2 {
+  color: var(--foreground);
+}
+
+.muted {
+  color: var(--muted-foreground);
+}

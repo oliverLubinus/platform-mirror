@@ -1,0 +1,73 @@
+/*
+ * Semantic design tokens - ported from the auth-provider design system
+ * (T1.5c pre-commit suite port). WCAG-AA audited: check-contrast.js fails
+ * the build if any text pair drops below 4.5:1 (3:1 for UI boundaries).
+ * All colors in app source must come from THIS file; the guard
+ * (check-design-tokens.js) rejects raw palette classes, inline styles,
+ * and raw hex outside this allowlist. New colors = new tokens here.
+ */
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --overlay: rgb(2 6 23 / 0.45);
+
+  --foreground: #171717;
+  --muted-foreground: #5b6577;
+
+  --primary: #013173;             /* brand navy */
+  --on-primary: #ffffff;
+  --secondary: #00c2c2;           /* brand teal (accent) */
+  --on-secondary: #013173;
+  --ring: #013173;
+
+  --border: #ced6e1;
+  --border-strong: #87919f;
+  --input-bg: #ffffff;
+
+  --success: #166534;
+  --success-soft: #e7f6ec;
+  --warning: #a15c07;
+  --warning-soft: #fdf2dd;
+  --error: #b91c1c;
+  --error-soft: #fdeaea;
+
+  /* Elevation: soft, low-alpha shadows (dark scheme gets stronger, deeper). */
+  --elev-card: 0 1px 2px rgb(2 6 23 / 0.06), 0 8px 24px rgb(2 6 23 / 0.08);
+
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #0b1220;
+  --surface: #121a2b;
+  --surface-hover: #1a2438;
+  --overlay: rgb(0 0 0 / 0.6);
+
+  --foreground: #e8edf5;
+  --muted-foreground: #94a3b8;
+
+  --primary: #6c9bff;             /* lightened brand variant (dark scheme) */
+  --on-primary: #081024;
+  --secondary: #00c2c2;
+  --on-secondary: #081024;
+  --ring: #6c9bff;
+
+  --border: #26314a;
+  --border-strong: #5a6894;
+  --input-bg: #0e1626;
+
+  --success: #4ade80;
+  --success-soft: rgb(74 222 128 / 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgb(251 191 36 / 0.14);
+  --error: #f87171;
+  --error-soft: rgb(248 113 113 / 0.14);
+
+  --elev-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+}
