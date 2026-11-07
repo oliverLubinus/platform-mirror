@@ -172,6 +172,9 @@ importers:
 
   packages/app-template:
     dependencies:
+      '@platform/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
       '@platform/server-core':
         specifier: workspace:*
         version: link:../server-core

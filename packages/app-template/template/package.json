@@ -12,7 +12,7 @@
     "dev:server": "tsx watch server/src/index.ts --env-file=.env",
     "dev:client": "vite client",
     "typecheck": "tsc -p server/tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit",
-    "test": "node --import tsx --test server/src/app.test.ts",
+    "test": "node --import tsx --test server/src/app.test.ts client/src/auth/authClient.test.ts",
     "build": "tsc -p server/tsconfig.build.json && vite build client",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
@@ -21,6 +21,7 @@
     "db:seed": "tsx server/prisma/seed.ts --env-file=.env"
   },
   "dependencies": {
+    "@platform/auth-client": "^0.2.0",
     "@platform/server-core": "^0.2.0",
     "@prisma/client": "^6.19.0",
     "express": "^5.1.0",

@@ -8,13 +8,30 @@
 export const strings = {
   'app.title': '{{APP_TITLE}}',
   'app.subtitle': 'Platform app scaffolded from @platform/app-template',
+  'app.loading': 'Loading…',
+
   'health.checking': 'Checking API health…',
   'health.ok': 'API is healthy',
   'health.down': 'API unreachable',
+
+  'auth.signingIn': 'Redirecting to sign in…',
+  'auth.signOut': 'Sign out',
+  'auth.signedOut.title': 'You are signed out',
+  'auth.signedOut.action': 'Sign in',
+  'auth.error.generic': 'Sign-in could not be completed.',
+
+  'callback.working': 'Completing sign-in…',
+  'callback.cancelled': 'Sign-in was cancelled.',
+  'callback.retry': 'Try again',
+
   'notes.title': 'Notes',
-  'notes.authRequired': 'Sign in to view your notes (the API is fail-closed until you authenticate).',
+  'notes.loading': 'Loading notes…',
   'notes.empty': 'No notes yet.',
-  'error.generic': 'Something went wrong. Please try again.',
+  // The server-side token verifier lands with T1.5c; until then the
+  // fail-closed API rejects even valid tokens — surface, never redirect
+  // (a redirect here would loop against the silent hosted-UI session).
+  'notes.unverified': 'The API could not verify your session yet (server-side token verification lands with the next milestone).',
+  'notes.error': 'Notes are not available right now.',
 } as const;
 
 export type StringKey = keyof typeof strings;

@@ -30,6 +30,48 @@ app-template/
 
 The payload lives under `template/` so the scaffold procedure is explicit and testable — what ships in a fresh app is exactly this directory, nothing platform-specific hidden alongside it.
 
+## First-consumer findings (ADR-020 Phase 2 feedback)
+
+T1.5b made this template the first real consumer of `@platform/auth-client`.
+The findings below are the adapter-design input for the `./react` subpath —
+each one is pinned by a test in `template/client/src/auth/authClient.test.ts`.
+
+- **F1 — The adapter owns a boot state machine, and it MUST be single-flight.**
+  Boot states: `authenticated | redirecting | signedOut | error`. React
+  StrictMode double-invokes effects, so concurrent `bootSession()` calls are
+  the NORM, not an edge case — two concurrent redirect dances would race on
+  single-use OIDC state. The wiring memoizes the boot promise; the adapter
+  must too (pinned: "boot is single-flight" test).
+- **F2 — SPA navigation after `handleCallback` is a CORRECTNESS requirement.**
+  A full page reload after the callback drops the in-memory tokens and
+  re-triggers the boot redirect dance — a loop. The callback page uses
+  `history.replaceState` and re-renders; the adapter must map returnTo to
+  router navigation, never `location.assign`.
+- **F3 — API-level 401s must NEVER trigger redirects.** The SDK does one
+  silent refresh + one retry, then SURFACES the 401. If the app (or a
+  naive ProtectedRoute) redirects on it, a backend that rejects
+  otherwise-valid tokens loops against the silent hosted-UI session. This
+  template's fail-closed server (until the T1.5c verifier) is exactly that
+  case — the honest surface + no-redirect policy is pinned by the wiring.
+- **F4 — `signOut()` resolves-signed-out even when endpoints fail.** The SDK
+  rejects with `LOGOUT_FAILED` but guarantees the local clear in its
+  `finally` block. The wiring catches and proceeds; the adapter should too.
+- **F5 — Config fails fast at instance creation.** Missing `VITE_*` auth
+  vars throw `CONFIG_INVALID` before any flow starts — a half-configured
+  client is a flow failure, not a degraded mode.
+
+## Dev prerequisites for the auth flow
+
+1. Register a dev client with auth-provider (`VITE_AUTH_CLIENT_ID`,
+   redirect URI `http://localhost:5173/auth/callback` — must match the
+   registration exactly). An unknown client is rejected at
+   `/auth/authorize`.
+2. `cp template/.env.example template/.env` and fill the three `VITE_*`
+   vars. Cold loads then pass through the hosted-UI redirect dance: silent
+   while the staging session lives, hosted login when it does not.
+3. The server stays FAIL-CLOSED until the real token verifier lands
+   (T1.5c) — authenticated users see the curated "not verified yet" note
+   state, not an error loop.
 ## Scaffold a new app
 
 ```bash
@@ -45,7 +87,7 @@ pnpm dev:client   # terminal 2 (:5173, /api proxied to :8080)
 ## T1.5 build order (DoD: fresh app scaffolds + CI green in under a day)
 
 - [x] **T1.5a** skeleton: client/server layout, server-core pre-wired, Prisma standard, compose dev env, CI mirror, scaffold script
-- [ ] **T1.5b** i18n skeleton completion + auth-client as first real consumer (login/callback/ensureSession/authenticatedFetch) — feeds the `./react` adapter design (ADR-020 Phase 2)
+- [x] **T1.5b** i18n skeleton completion + auth-client as first real consumer (login/callback/ensureSession/authenticatedFetch) — feeds the `./react` adapter design (ADR-020 Phase 2) *(done: the wiring owns a single-flight boot state machine + the loop-safe 401 policy; 15 consumer tests pin the full OIDC dance through the SDK - single-flight boot, returnTo-out-of-URL, PKCE verifier on the exchange, single-use state, access_denied surfacing, refresh+retry with the new Bearer, CSRF double-submit logout, local-clear-guaranteed sign-out; findings F1-F5 recorded in the README as the adapter-design input; no hardcoded literals - every auth/callback string centralized per backlog item 6)*
 - [ ] **T1.5c** OpenAPI contract-first CI (R-PKG-11), permission-catalog check (ADR-007), pre-commit suite port (whitespace, design tokens, contrast, layering, bundle-secrets), real JWKS verifier (replaces the fail-closed stub in server-core)
 - [ ] **T1.5d** AGENTS.md scaffold (T2.1: mission, requirement-ID map, never-build list, escalation rule) + onboarding rehearsal
 

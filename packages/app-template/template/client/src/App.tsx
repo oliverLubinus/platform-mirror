@@ -1,34 +1,119 @@
-import { useEffect, useState } from 'react';
-import { api, ApiClientError } from './api/client';
+/**
+ * App shell with the boot gate (the exact surface the `./react` adapter
+ * will own as an AuthProvider + useAuth pair — finding F1).
+ *
+ *   authenticated → content (notes via authedFetch)
+ *   redirecting   → nothing (navigation in flight)
+ *   signedOut     → explicit post-logout screen with a Sign in action
+ *   error         → curated copy; no login screen is ever rendered (R-PKG-04)
+ */
+import { useEffect, useMemo, useState } from 'react';
+import { getAppAuth, type BootState } from './auth/authClient';
+import { createApi, ApiClientError } from './api/client';
 import { t } from './i18n/strings';
+import { formatDate } from './i18n/format';
+import type { Note } from './api/client';
 
-type HealthState = 'checking' | 'ok' | 'down';
+type NotesState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'ready'; notes: Note[] }
+  | { phase: 'unverified' }
+  | { phase: 'error' };
 
 export default function App() {
-  const [health, setHealth] = useState<HealthState>('checking');
-  const [notesBlocked, setNotesBlocked] = useState(false);
+  const auth = useMemo(() => getAppAuth(), []);
+  const api = useMemo(() => createApi((input, init) => auth.authedFetch(input, init)), [auth]);
+  const [boot, setBoot] = useState<BootState>({ state: 'redirecting' });
+  const [notes, setNotes] = useState<NotesState>({ phase: 'idle' });
 
+  // Boot gate. Single-flight inside the wiring module (StrictMode-safe).
   useEffect(() => {
-    api
-      .health()
-      .then(() => setHealth('ok'))
-      .catch(() => setHealth('down'));
-    // The template's DB route is fail-closed by design: unauthenticated calls
-    // get 401 UNAUTHENTICATED. The auth-client wiring (T1.5b) turns this
-    // state into a login redirect; until then it renders the honest message.
+    let cancelled = false;
+    auth
+      .bootSession()
+      .then((result) => {
+        if (!cancelled) setBoot(result);
+      })
+      .catch(() => {
+        if (!cancelled) setBoot({ state: 'error', code: 'UNKNOWN', message: t('auth.error.generic') });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [auth]);
+
+  // Notes load only once authenticated. The server is fail-closed until the
+  // real token verifier lands (T1.5c) — a surviving 401 surfaces honestly
+  // and NEVER triggers a redirect (loop safety).
+  useEffect(() => {
+    if (boot.state !== 'authenticated' || notes.phase !== 'idle') return;
+    setNotes({ phase: 'loading' });
     api
       .notes()
-      .then(() => setNotesBlocked(false))
-      .catch((err: unknown) => setNotesBlocked(err instanceof ApiClientError && err.code === 'UNAUTHENTICATED'));
-  }, []);
+      .then((res) => setNotes({ phase: 'ready', notes: res.notes }))
+      .catch((err: unknown) => {
+        if (err instanceof ApiClientError && err.code === 'UNAUTHENTICATED') {
+          setNotes({ phase: 'unverified' });
+        } else {
+          setNotes({ phase: 'error' });
+        }
+      });
+  }, [boot, notes.phase, api]);
+
+  if (boot.state === 'redirecting') return null;
+  if (boot.state === 'error') {
+    return (
+      <main>
+        <h1>{t('app.title')}</h1>
+        <p>{t('auth.error.generic')}</p>
+        <button type="button" onClick={() => void auth.signIn(window.location.pathname)}>
+          {t('callback.retry')}
+        </button>
+      </main>
+    );
+  }
+  if (boot.state === 'signedOut') {
+    return (
+      <main>
+        <h1>{t('app.title')}</h1>
+        <p>{t('auth.signedOut.title')}</p>
+        <button type="button" onClick={() => void auth.signIn(window.location.pathname)}>
+          {t('auth.signedOut.action')}
+        </button>
+      </main>
+    );
+  }
 
   return (
     <main>
       <h1>{t('app.title')}</h1>
       <p>{t('app.subtitle')}</p>
-      <p data-testid="health">{health === 'checking' ? t('health.checking') : health === 'ok' ? t('health.ok') : t('health.down')}</p>
+      <button
+        type="button"
+        onClick={() => {
+          setNotes({ phase: 'idle' });
+          void auth.signOut().then(() => setBoot({ state: 'signedOut' }));
+        }}
+      >
+        {t('auth.signOut')}
+      </button>
       <h2>{t('notes.title')}</h2>
-      {notesBlocked ? <p data-testid="notes-blocked">{t('notes.authRequired')}</p> : <p>{t('notes.empty')}</p>}
+      {notes.phase === 'loading' && <p>{t('notes.loading')}</p>}
+      {notes.phase === 'unverified' && <p>{t('notes.unverified')}</p>}
+      {notes.phase === 'error' && <p>{t('notes.error')}</p>}
+      {notes.phase === 'ready' &&
+        (notes.notes.length === 0 ? (
+          <p>{t('notes.empty')}</p>
+        ) : (
+          <ul>
+            {notes.notes.map((note) => (
+              <li key={note.id}>
+                <strong>{note.title}</strong> — {formatDate(note.createdAt)}
+              </li>
+            ))}
+          </ul>
+        ))}
     </main>
   );
 }
