@@ -4,6 +4,21 @@
  */
 import { PrismaClient } from '@prisma/client';
 
+// Fail FAST with guidance instead of a cryptic PrismaClientInitializationError
+// deep inside the first query. The quality gate is DB-free BY DESIGN, so
+// runtime misconfiguration never reaches it - this guard is the seed's own
+// gate (the typecheck catches compile-level drift, e.g. renamed models).
+if (!process.env.DATABASE_URL) {
+  console.error(
+    'db:seed: DATABASE_URL is not set.\n' +
+      '  1. cp .env.example .env\n' +
+      '  2. pnpm db:up        (docker compose)\n' +
+      '  3. pnpm db:migrate   (creates the schema)\n' +
+      '  4. pnpm db:seed'
+  );
+  process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 await prisma.note.deleteMany();

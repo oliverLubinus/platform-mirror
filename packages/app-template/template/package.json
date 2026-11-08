@@ -9,7 +9,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev:server": "tsx watch server/src/index.ts --env-file=.env",
+    "dev:server": "node --watch --env-file=.env --import tsx server/src/index.ts",
     "dev:client": "vite client",
     "typecheck": "tsc -p server/tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit",
     "test": "node --import tsx --test server/src/app.test.ts server/src/openapi.test.ts server/src/permissions.test.ts client/src/auth/authClient.test.ts",
@@ -26,7 +26,7 @@
     "db:down": "docker compose down",
     "db:generate": "prisma generate --schema server/prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema server/prisma/schema.prisma",
-    "db:seed": "tsx server/prisma/seed.ts --env-file=.env"
+    "db:seed": "node --env-file-if-exists=.env --import tsx server/prisma/seed.ts"
   },
   "dependencies": {
     "@platform/auth-client": "^0.2.0",
