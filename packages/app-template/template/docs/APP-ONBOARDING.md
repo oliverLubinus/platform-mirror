@@ -63,6 +63,8 @@ this repo. The coordinator owns `architecture/` and `platform/`.
 ## End state — when is onboarding DONE
 
 All steps checked, every gate green, and the scaffold rehearsal equivalent
-passes for THIS app. From then on the process is continuous: plan ticks ride
+passes for THIS app. From then on the RECURRING process is the task workflow in AGENTS.md
+(the eight-step loop with blocker check, escalation checkpoint, and done state).
+Plan ticks ride
 their commits, requirements evolve through the two-layer model, and platform
 truth arrives only via packages and bump PRs.

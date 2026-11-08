@@ -75,6 +75,35 @@ copy is a platform fork by another name:
 8. **Identity data duplication** (→ ADR-001/ADR-002). No local user tables, password
    columns, or role tables; membership comes from auth-provider's API (integration contract).
 
+## Task workflow (recurring loop)
+
+Every task, in this order:
+
+1. **Pick + read the task** from `planning/implementation-plan.md` — including its DoD and
+   the requirement IDs it cites.
+2. **Read the requirements** (central registry, read-only) those IDs resolve to.
+3. **Read the architecture they reference** — the ADRs and contract sections cited by the
+   requirement entries, before designing anything.
+4. **Check blockers first.** If the task depends on a pending platform row (integration
+   checklist PENDING entries, registry publish, a package not yet released), resolve what is
+   resolvable or PICK ANOTHER TASK — never implement against a missing dependency.
+5. **Grow app-internal architecture** per the contract-first rules (spec + manifest +
+   catalog together). Central platform architecture is READ-ONLY: if the task cannot proceed
+   without a platform change, STOP and escalate — do not fork.
+6. **Improve requirements as discovered** (two-layer model): refinements land in
+   `docs/requirements.md` in the same commit; new needs are minted `proposed`; contract-meaning
+   changes escalate.
+7. **Implement + test:** unit tests for behavior, PLUS requirement-behavior tests that cite
+   the requirement ID they verify (traceability, below).
+8. **Commit + push** with inline evidence (convention below). **Done =** all gates green,
+   plan ticked with evidence, nothing uncommitted or unpushed. Leaving unticked plan rows with
+   landed work — or unpushed commits — is a handover defect, not a style choice.
+
+**Requirement-test traceability:** a test that verifies a requirement's acceptance behavior
+cites the ID in its header (e.g. `// R-PM-04a: org-scoped queries — deny cross-org reads`),
+and the `docs/requirements.md` entry references its verifying tests. Coverage stays
+bidirectional and greppable; a requirement with no citing test is unproven.
+
 ## Commit-evidence convention
 
 Every commit that changes behavior carries its evidence inline — reviewers and future
