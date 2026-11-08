@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Berlin",
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "@platform/*: in-range minor/patch updates arrive as automated bump PRs; majors (and 0.x minor-as-major) are NEVER auto-merged - they are deliberate, reviewed upgrades per the platform N/N-1 policy.",
+      "matchPackagePatterns": ["^@platform/"],
+      "automerge": false
+    }
+  ]
+}

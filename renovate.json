@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Berlin",
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "Platform packages are released via the changesets release train - renovate never touches @platform/* inside this monorepo (workspace sources, not registry deps).",
+      "matchPackagePatterns": ["^@platform/"],
+      "enabled": false
+    }
+  ]
+}
