@@ -3,3 +3,4 @@ dist/
 .env
 server/prisma/migrations/dev.db*
 *.tsbuildinfo
+server/src/generated/prisma/

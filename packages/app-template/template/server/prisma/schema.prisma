@@ -2,14 +2,14 @@
 // one schema per service, migrations are the ONLY path to a schema change
 // (`prisma migrate dev` locally, `prisma migrate deploy` in staging/prod —
 // never `db push` outside throwaway experiments), the generated client is
-// never committed, and seeds carry SYNTHETIC data only (R-ENV-01).
+// never committed (generated at build into src/generated/prisma, gitignored), and seeds carry SYNTHETIC data only (R-ENV-01). Prisma 7 stack: prisma-client generator + PrismaPg driver adapter - the SAME drilled pattern as auth-provider (no Rust query engine).
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 /// Synthetic demo model — delete it with your app's first real migration.

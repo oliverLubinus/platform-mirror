@@ -2,7 +2,8 @@
  * Synthetic-data seed (R-ENV-01). Dev/staging data is NEVER real user data.
  * Run: pnpm db:seed
  */
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 // Fail FAST with guidance instead of a cryptic PrismaClientInitializationError
 // deep inside the first query. The quality gate is DB-free BY DESIGN, so
@@ -19,7 +20,8 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 await prisma.note.deleteMany();
 await prisma.note.createMany({
