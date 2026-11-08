@@ -1,5 +1,6 @@
 {
   "name": "{{APP_SLUG}}",
+  "packageManager": "pnpm@12.18.0",
   "version": "0.1.0",
   "private": true,
   "description": "{{APP_TITLE}} — platform app scaffolded from @platform/app-template (R-PKG-09).",
