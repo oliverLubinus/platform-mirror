@@ -12,8 +12,8 @@
   "scripts": {
     "dev:server": "node --watch --env-file=.env --import tsx server/src/index.ts",
     "dev:client": "vite client",
-    "typecheck": "tsc -p server/tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit",
-    "test": "node --import tsx --test server/src/app.test.ts server/src/openapi.test.ts server/src/permissions.test.ts server/src/errorCodes.test.ts server/src/contract-conformance.test.ts client/src/auth/authClient.test.ts",
+    "typecheck": "prisma generate --schema server/prisma/schema.prisma && tsc -p server/tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit",
+    "test": "prisma generate --schema server/prisma/schema.prisma && node --import tsx --test server/src/app.test.ts server/src/openapi.test.ts server/src/permissions.test.ts server/src/errorCodes.test.ts server/src/contract-conformance.test.ts client/src/auth/authClient.test.ts",
     "build": "prisma generate --schema server/prisma/schema.prisma && tsc -p server/tsconfig.build.json && vite build client",
     "lint": "eslint .",
     "check:whitespace": "node client/scripts/check-whitespace.cjs",
