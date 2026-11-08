@@ -1,3 +1,19 @@
+# pnpm 11+ supply-chain policy (mirrored from the platform monorepo, T1.5a):
+# strictDepBuilds defaults to true - an unreviewed install script fails the
+# install with ERR_PNPM_IGNORED_BUILD_SCRIPTS. The entries below are the
+# reviewed allowlist this app needs: esbuild ships a postinstall
+# binary-check script (tsx depends on it), prisma + @prisma/* generate the
+# client engine. Anything new must be reviewed before it lands here.
+# (Note: the server/ and client/ dirs hold source only - the app manifest
+# lives at the repo root, so the packages entries below are inert.)
+allowBuilds:
+  esbuild: true
+  prisma: true
+  "@prisma/client": true
+  "@prisma/engines": true
+
 packages:
   - server
   - client
+
+

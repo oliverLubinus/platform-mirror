@@ -8,7 +8,8 @@
  * placeholders, and prints the next steps. The platform repo stays untouched.
  */
 import { cpSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
 function arg(flag) {
@@ -56,7 +57,28 @@ function walk(dir) {
 }
 walk(dest);
 
-console.log(`scaffolded ${slug} -> ${dest}`);
+// Rewrite platform deps to link: paths. A fresh app repo is NOT a pnpm
+// workspace containing the platform packages, and the packages are not on
+// any registry yet — `workspace:*` (monorepo form) or `^0.x` (the intended
+// registry form) both fail `pnpm install` immediately. Until the platform
+// packages are published, EVERY @platform/* dep is linked to the platform
+// checkout; when a registry exists, scaffold grows a --registry mode and
+// this rewrite is dropped.
+const packagesRoot = resolve(fileURLToPath(new URL('..', import.meta.url))); // packages/
+const pkgPath = join(dest, 'package.json');
+const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+let rewritten = 0;
+for (const [dep, spec] of Object.entries(pkg.dependencies ?? {})) {
+  if (dep.startsWith('@platform/')) {
+    const pkgDir = join(packagesRoot, dep.slice('@platform/'.length));
+    const rel = relative(dest, pkgDir).replaceAll('\\', '/');
+    pkg.dependencies[dep] = 'link:' + rel;
+    rewritten++;
+  }
+}
+writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+
+console.log(`scaffolded ${slug} -> ${dest} (${rewritten} platform dep(s) linked)`);
 console.log('next steps:');
 console.log('  cd ' + dest);
 console.log('  git init && pnpm install');
