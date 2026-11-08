@@ -11,6 +11,10 @@ this repo. The coordinator owns `architecture/` and `platform/`.
 
 ## Step 0 — Preconditions (coordinator, before you start)
 
+Operator-side machine/keys/secrets provisioning is documented in
+architecture/operations/agent-workspace-setup.md (dev-machine model: local issuer,
+staging separate).
+
 - [ ] The app-template rehearsal is green (fresh app scaffolds + CI-equivalent checks pass)
 - [ ] Registry publish state known: `@platform/*` deps are `link:` until the first publish, then caret-pinned (`^0.2.0`) — the T4.3 protocol
 - [ ] Platform contract artifacts exist and are importable (`@platform/server-core`: verifier, error registry, `PLATFORM_ERROR_SCHEMA`, consumer template)
