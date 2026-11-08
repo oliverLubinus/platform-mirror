@@ -22,6 +22,7 @@
     "check:bundle-secrets": "node client/scripts/check-bundle-secrets.cjs client/dist",
     "hooks:install": "node client/scripts/hooks/install-hooks.cjs",
     "check:quality-gate": "pnpm check:whitespace && pnpm check:design-tokens && pnpm check:contrast && pnpm check:layering && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm check:bundle-secrets",
+    "postinstall": "prisma generate --schema server/prisma/schema.prisma",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "db:generate": "prisma generate --schema server/prisma/schema.prisma",
