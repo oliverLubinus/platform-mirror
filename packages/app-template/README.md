@@ -91,6 +91,10 @@ pnpm dev:server   # terminal 1 (:8080)
 pnpm dev:client   # terminal 2 (:5173, /api proxied to :8080)
 ```
 
+After scaffolding, follow **`docs/APP-ONBOARDING.md`** in the fresh app —
+the consolidated runbook (six steps: harness → checklist → seam → plan →
+requirements registry, each with its governing artifact and proving gate).
+
 ## T1.5 build order (DoD: fresh app scaffolds + CI green in under a day)
 
 - [x] **T1.5a** skeleton: client/server layout, server-core pre-wired, Prisma standard, compose dev env, CI mirror, scaffold script
