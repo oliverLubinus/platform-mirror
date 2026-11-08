@@ -65,7 +65,7 @@ export function createNoteHandler(store: NotesStore): RequestHandler {
     if (typeof title !== 'string' || title.trim() === '' || typeof body !== 'string') {
       res
         .status(400)
-        .json({ error: { code: 'VALIDATION_ERROR', message: 'title and body are required', status: 400 } });
+        .json({ error: { code: 'VALIDATION_FAILED', message: 'title and body are required', status: 422 } });
       return;
     }
     const row = await store.create({ title: title.trim(), body });

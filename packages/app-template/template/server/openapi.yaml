@@ -69,8 +69,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NoteMutationResponse'
-        '400':
-          description: Validation error
+        '422':
+          description: Validation error (VALIDATION_FAILED)
           content:
             application/json:
               schema:
