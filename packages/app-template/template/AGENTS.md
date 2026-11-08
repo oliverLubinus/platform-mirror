@@ -18,7 +18,10 @@ rails — not to touch identity, platform libraries, or infrastructure conventio
 
 Before writing or modifying code, read and apply the platform baseline. The canonical
 documents live in the platform monorepo (`architecture/`); the IDs below are the ones
-this repo's code and CI actively enforce:
+this repo's code and CI actively enforce. **Living plan:** `planning/implementation-plan.md`
+— the task-level tracker, updated IN THE SAME COMMIT as the work it tracks with evidence
+inline (T4.3 rule). Per-app plans live in-repo by platform convention; this repo is
+read-only on `architecture/` inputs.
 
 | ID | Concern | What it means for this repo |
 | --- | --- | --- |
