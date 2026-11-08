@@ -37,6 +37,27 @@ read-only on `architecture/` inputs.
 | §3 error registry | Errors | Errors use the platform envelope `{ error: { code, message, status, details? } }` with stable codes from the app registry (`server/src/errors/errorCodes.ts`). No ad-hoc error shapes. |
 | Backlog item 4 (DB) | Schema | Prisma migrations are the ONLY path to a schema change (`pnpm db:migrate`); synthetic seed data only (`pnpm db:seed`, R-ENV-01). |
 
+## Requirements evolution & architecture layering
+
+Two layers, no duplication:
+- **Central (architecture repo — read-only for this agent):** DECIDED
+  requirements of record, ADRs, inter-app contracts. Never restate platform
+  truth in app docs or code — IMPORT it (`@platform/*` artifacts) or
+  reference it by ID.
+- **This repo (agent-owned):** `docs/requirements.md` — the living
+  spec-rooted registry: refinements and PROPOSED new requirements, updated
+  under the same-commit rule. IDs are app-namespaced (`R-{{APP_SLUG_UPPER}}-*`),
+  so minting locally is collision-free.
+
+Change types: **refinement** (detail, acceptance criteria) — do it locally;
+**new requirement** — mint locally as `proposed`, the coordinator ratifies
+it into the central registry; **contract-meaning change** (de-scope,
+supersede) — STOP and escalate (see the decision-escalation rule).
+Conformance sync: the gate asserts this repo's spec conforms to the platform
+contract artifacts (`server/src/contract-conformance.test.ts`) — platform
+truth changes arrive as red gates + Renovate bump PRs, never as hand-synced
+copies.
+
 ## Hard never-build list
 
 Do not build these, even if asked in-app. Each exists as a platform service; a local

@@ -76,3 +76,10 @@ export {
   createTokenVerifier
 } from './tokenVerifier.js';
 export type { IssuerKey, TokenVerifierConfig } from './tokenVerifier.js';
+
+// Platform contract artifacts (machine-checkable platform truth). Apps
+// ASSERT conformance against these — they never restate the contract
+// (no two truths; drift fails the app's own gate at build time).
+export { PLATFORM_ERROR_SCHEMA } from './errors/platformErrorSchema.js';
+
+
