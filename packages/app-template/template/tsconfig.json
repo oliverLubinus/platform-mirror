@@ -1,0 +1,15 @@
+{
+  "//": "Claims prisma.config.ts for editor type-checking (the server/client tsconfigs sit below it, so tsconfig discovery walking up from prisma.config.ts found nothing and the file fell to an inferred project without node types - TS2591 on process). Scope is deliberately only prisma.config.ts: server and client keep their own projects.",
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["prisma.config.ts"]
+}
