@@ -49,13 +49,18 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
-      # Same gates as ci.yml — the train never publishes unverified code.
+      # Same gates as ci.yml, in ci.yml's ORDER - packages' dist/ is
+      # gitignored and must be BUILT before anything can typecheck against
+      # @agentic-dna/* types. The first post-transfer release run failed
+      # exactly here (TS2307 cascade in app-template) because this workflow
+      # typechecked a fresh checkout before building. The train still never
+      # publishes unverified code: all three gates run before publish.
+      - name: Build (packages -> dist, template client bundle)
+        run: pnpm build
       - name: Typecheck
         run: pnpm typecheck
       - name: Test
         run: pnpm test
-      - name: Build
-        run: pnpm build
 
       - uses: changesets/action@v1
         with:
@@ -68,3 +73,4 @@ jobs:
           # GITHUB_TOKEN has packages:write for this repo -> valid publish
           # credential for GitHub Packages (no PAT bootstrap in CI, R-ENV-03).
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
