@@ -39,6 +39,17 @@ reference).
    bootstrap in CI (R-ENV-03: secrets live outside repos). `release.yml`
    passes `registry-url` to `actions/setup-node`, which writes the
    user-level `~/.npmrc` auth line from `NODE_AUTH_TOKEN`.
+3. **Allow GitHub Actions to create and approve pull requests** (repo
+   Settings → Actions → General → Workflow permissions; an org-level
+   equivalent exists). `changesets/action` opens the Version Packages PR
+   with the workflow's `GITHUB_TOKEN` — left at the default (denied), the
+   action still runs the gates, versions, commits, and force-pushes the
+   `changeset-release/main` branch, but PR creation then fails with
+   "GitHub Actions is not permitted to create or approve pull requests"
+   and the train stalls (first seen 2026-11-11, initial release attempt).
+   Manual recovery without the setting: open and merge the Version Packages
+   PR from the pushed `changeset-release/main` branch — the publish run
+   after the merge needs no PR permission.
 
 ## Publishing (the train)
 
