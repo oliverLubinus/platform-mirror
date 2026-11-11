@@ -16,8 +16,8 @@ architecture/operations/agent-workspace-setup.md (dev-machine model: local issue
 staging separate).
 
 - [ ] The app-template rehearsal is green (fresh app scaffolds + CI-equivalent checks pass)
-- [ ] Registry publish state known: `@platform/*` deps are `link:` until the first publish, then caret-pinned (`^0.2.0`) — the T4.3 protocol
-- [ ] Platform contract artifacts exist and are importable (`@platform/server-core`: verifier, error registry, `PLATFORM_ERROR_SCHEMA`, consumer template)
+- [ ] Registry publish state known: `@agentic-dna/*` deps are `link:` until the first publish, then caret-pinned (`^0.2.0`) — the T4.3 protocol
+- [ ] Platform contract artifacts exist and are importable (`@agentic-dna/server-core`: verifier, error registry, `PLATFORM_ERROR_SCHEMA`, consumer template)
 
 ## Step 1 — Scaffold (done if you are reading this)
 
@@ -60,7 +60,7 @@ staging separate).
 | Pathway | Direction | Mechanism |
 | --- | --- | --- |
 | READ | architecture/ → this agent | requirements of record, ADRs, interface inventory, integration contract — read-only, always |
-| CONSUME | packages → this app's code | `@platform/*` artifacts (`createTokenVerifier`, `PLATFORM_ERROR_SCHEMA`, registry, consumer template) — import, never restate |
+| CONSUME | packages → this app's code | `@agentic-dna/*` artifacts (`createTokenVerifier`, `PLATFORM_ERROR_SCHEMA`, registry, consumer template) — import, never restate |
 | WRITE-BACK | this agent → coordinator | platform findings → platform-repo issue/PR (single-owner lane); requirement proposals → `proposed` in-repo → ratification; contract-meaning changes → escalation |
 | PULL | platform releases → this repo | Renovate bump PRs; majors (and 0.x minor-as-major) always reviewed (N/N-1) |
 

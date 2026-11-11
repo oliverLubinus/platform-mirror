@@ -7,7 +7,7 @@
  *   staging, R-ENV-01).
  */
 
-import type { IssuerKey } from '@platform/server-core';
+import type { IssuerKey } from '@agentic-dna/server-core';
 
 /**
  * Parse the issuer key ring (JWT_SIGNING_KEYS env - the SAME value the

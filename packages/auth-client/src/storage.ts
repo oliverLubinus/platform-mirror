@@ -1,7 +1,7 @@
 /**
  * @file storage.ts
  * @description
- *   Storage surface for `@platform/auth-client`'s non-token flow state
+ *   Storage surface for `@agentic-dna/auth-client`'s non-token flow state
  *   (PKCE verifier, OIDC state, returnTo). NEVER used for tokens
  *   (R-PKG-03: tokens live in memory only — see tokenStore.ts).
  *

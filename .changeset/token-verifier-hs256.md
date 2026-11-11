@@ -1,5 +1,5 @@
 ---
-'@platform/server-core': minor
+'@agentic-dna/server-core': minor
 ---
 
 New public API: createTokenVerifier(config) - the real HS256 access-token

@@ -1,4 +1,4 @@
-# @platform/auth-client
+# @agentic-dna/auth-client
 
 One audited OIDC client for every platform SPA (T1.4, ADR-009 §1). Framework-agnostic — no React/Next/Vite imports; the React adapter (session provider, hooks, `ProtectedRoute`, role-gated rendering, "no access" page) ships as a `./react` subpath with the first real consumer (app-template / PM retrofit, ADR-020 Phase 2 — findings feed back into the adapter design).
 
@@ -7,7 +7,7 @@ One audited OIDC client for every platform SPA (T1.4, ADR-009 §1). Framework-ag
 Standard **Authorization Code + PKCE (S256)** against auth-provider's hosted login UI. The SDK owns the protocol, not the pixels: it never renders login screens and never sees credentials (R-PKG-04 — one audited hosted UI). It is a **public client**: PKCE only, no secrets exist client-side (R-PKG-03).
 
 ```ts
-import { createAuthClient } from '@platform/auth-client';
+import { createAuthClient } from '@agentic-dna/auth-client';
 
 export const auth = createAuthClient({
   authApiBaseUrl: 'https://auth-api.staging.agentic-dna.cloud',
@@ -105,7 +105,7 @@ Reference basis: auth-provider's frontend modules, audited against the same repo
 
 ## Testing
 
-`pnpm --filter @platform/auth-client test` — 80 tests: PKCE RFC vectors (cross-checked against `node:crypto`), flow-state persistence/cleanup, callback hardening (state replay, missing code/verifier, `error=` redirects), refresh strategy bodies + rotation + claim-once concurrency, 401 retry semantics, logout CSRF double-submit, and the source-rule scans.
+`pnpm --filter @agentic-dna/auth-client test` — 80 tests: PKCE RFC vectors (cross-checked against `node:crypto`), flow-state persistence/cleanup, callback hardening (state replay, missing code/verifier, `error=` redirects), refresh strategy bodies + rotation + claim-once concurrency, 401 retry semantics, logout CSRF double-submit, and the source-rule scans.
 
 ## Build
 

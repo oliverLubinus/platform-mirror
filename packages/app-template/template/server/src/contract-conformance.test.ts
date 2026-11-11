@@ -5,7 +5,7 @@
  *   OpenAPI spec must CONFORM to platform truth — never restate it.
  *
  *   The platform contract ships as importable artifacts in
- *   `@platform/server-core` (PLATFORM_ERROR_SCHEMA today; the OIDC security
+ *   `@agentic-dna/server-core` (PLATFORM_ERROR_SCHEMA today; the OIDC security
  *   scheme and ADR-016 event envelope follow the same pattern as they gain
  *   machine-checkable forms). This test asserts:
  *
@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { PLATFORM_ERROR_CODES, PLATFORM_ERROR_SCHEMA } from '@platform/server-core';
+import { PLATFORM_ERROR_CODES, PLATFORM_ERROR_SCHEMA } from '@agentic-dna/server-core';
 import { errorCodes } from './errors/errorCodes.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -5,7 +5,7 @@
  *   replaces the fail-closed `failClosedVerifier` stub for every platform
  *   app backend. Zero-dependency: HS256 verification is HMAC-SHA256 plus
  *   constant-time comparison, both in `node:crypto` — no jose, no JSON Web
- *   library, keeping @platform/server-core dependency-free.
+ *   library, keeping @agentic-dna/server-core dependency-free.
  *
  *   Reality note (deliberate divergence from the plan's "JWKS" wording):
  *   the live issuer signs HS256 with a SHARED SECRET and deliberately omits

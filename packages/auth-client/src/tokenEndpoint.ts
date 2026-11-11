@@ -1,7 +1,7 @@
 /**
  * @file tokenEndpoint.ts
  * @description
- *   Direct token-endpoint client for `@platform/auth-client`.
+ *   Direct token-endpoint client for `@agentic-dna/auth-client`.
  *
  *   Contract is CODE-VERIFIED against the live auth-provider backend
  *   (2026-11-06): `POST /auth/token` (backend `tokenHandler` +

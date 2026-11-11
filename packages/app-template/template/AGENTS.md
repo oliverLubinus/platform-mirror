@@ -1,8 +1,8 @@
 # AGENTS.md — {{APP_TITLE}} implementation harness
 
-This repository is a **platform app** scaffolded from `@platform/app-template` (R-PKG-09).
+This repository is a **platform app** scaffolded from `@agentic-dna/app-template` (R-PKG-09).
 It is worked by **one agent per repo** (ADR-012): implementation happens here, platform
-packages (`@platform/server-core`, `@platform/auth-client`) are consumed, not forked.
+packages (`@agentic-dna/server-core`, `@agentic-dna/auth-client`) are consumed, not forked.
 Findings, friction, and missing platform capabilities flow back through the platform
 feedback loop (ADR-020 Phase 2) — never as local re-implementations.
 
@@ -28,7 +28,7 @@ read-only on `architecture/` inputs.
 | R-PKG-09 | Pre-wired scaffold | This app STARTS with the audited baseline (headers, envelopes, rate limiting, auth, audit hook). Never strip platform wiring to make a test pass. |
 | R-PKG-11 | Contract-first API | Every HTTP endpoint has an operation in `server/openapi.yaml` AND an entry in `server/src/routes.ts`. The drift gate (`openapi.test.ts`) fails the build on mismatch — add both or neither. |
 | R-PKG-04 | Curated auth UX | No login UI in this repo. Identity screens are auth-provider's hosted UI; this app renders only curated boot states (authenticated / redirecting / signedOut / error) — see `client/src/App.tsx`. |
-| ADR-004 / ADR-005 | Auth & tokens | All OIDC flows, token storage, refresh, and Bearer injection go through `@platform/auth-client` (`client/src/auth/authClient.ts`). The server verifies tokens with `createTokenVerifier` from `@platform/server-core` — key ring via `JWT_SIGNING_KEYS`, never hand-rolled. |
+| ADR-004 / ADR-005 | Auth & tokens | All OIDC flows, token storage, refresh, and Bearer injection go through `@agentic-dna/auth-client` (`client/src/auth/authClient.ts`). The server verifies tokens with `createTokenVerifier` from `@agentic-dna/server-core` — key ring via `JWT_SIGNING_KEYS`, never hand-rolled. |
 | ADR-007 | Permissions | Permissions are `<app>.<resource>:<action>` strings declared in `server/src/permissions/catalog.ts` and lint-checked (`permissions.test.ts`). Routes declare their permission in the manifest. Enforcement wiring (membership source) is a platform backlog item — do not invent a local substitute. |
 | ADR-009 / design system | Styling | All colors come from the semantic tokens in `client/src/styles/tokens.css`. The guard (`client/scripts/check-design-tokens.cjs`) rejects raw palette classes, inline styles, and raw hex outside that file. Contrast (`check-contrast.cjs`) must stay WCAG AA (≥ 4.5:1 text, ≥ 3:1 UI). |
 | G1 layering | Client data flow | UI files never import `src/api/**` directly — use-case hooks in `src/hooks/**` own data access. Enforced by `check-layering.cjs` with a shrink-only baseline. |
@@ -42,7 +42,7 @@ read-only on `architecture/` inputs.
 Two layers, no duplication:
 - **Central (architecture repo — read-only for this agent):** DECIDED
   requirements of record, ADRs, inter-app contracts. Never restate platform
-  truth in app docs or code — IMPORT it (`@platform/*` artifacts) or
+  truth in app docs or code — IMPORT it (`@agentic-dna/*` artifacts) or
   reference it by ID.
 - **This repo (agent-owned):** `docs/requirements.md` — the living
   spec-rooted registry: refinements and PROPOSED new requirements, updated
@@ -65,7 +65,7 @@ copy is a platform fork by another name:
 
 1. **Hosted-UI login screens** (→ R-PKG-04). No sign-in/sign-up/mfa pages here, ever.
 2. **Own token storage or lifecycle** (→ ADR-004/005). No localStorage tokens, no manual
-   refresh logic, no cookie sessions for identity — `@platform/auth-client` owns it.
+   refresh logic, no cookie sessions for identity — `@agentic-dna/auth-client` owns it.
 3. **Own crypto, rate limiting, or log-redaction** (→ R-PKG-08). Server-core primitives only.
 4. **Own JWT/JWKS verification** (→ ADR-004). `createTokenVerifier` from server-core only.
 5. **Raw palette colors / inline styles** (→ ADR-009). Tokens in `tokens.css` only; need a
@@ -126,7 +126,7 @@ hooks, routes, catalog entries, copy, migrations (additive), tests.
 
 **STOP and escalate to the platform owner (do not implement locally) when:**
 
-1. The change would touch `@platform/server-core`, `@platform/auth-client`, or the
+1. The change would touch `@agentic-dna/server-core`, `@agentic-dna/auth-client`, or the
    platform repo in any way — that is a platform decision (ADR-012 governance).
 2. A never-build item seems necessary to solve the task. That is a signal the platform
    is missing a capability — raise it through the ADR-020 feedback channel with the

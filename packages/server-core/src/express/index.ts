@@ -1,10 +1,10 @@
 /**
- * `@platform/server-core/express` — the Express-facing platform middleware.
+ * `@agentic-dna/server-core/express` — the Express-facing platform middleware.
  *
  * Types-only module surface: express itself is an OPTIONAL peerDependency
  * (consumers are Express apps by definition); express-rate-limit is an
  * optional peer ONLY for the rate-limiter module. No runtime dependency
- * enters @platform/server-core itself.
+ * enters @agentic-dna/server-core itself.
  */
 
 // Error-handler adapter (T1.3c)

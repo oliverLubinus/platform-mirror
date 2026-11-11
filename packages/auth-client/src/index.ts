@@ -1,5 +1,5 @@
 /**
- * @platform/auth-client — public surface (R-PKG-03, ADR-009 §1).
+ * @agentic-dna/auth-client — public surface (R-PKG-03, ADR-009 §1).
  *
  * Framework-agnostic core: OIDC Authorization Code + PKCE, in-memory access
  * tokens, silent refresh, authenticated fetch. The React adapter (session

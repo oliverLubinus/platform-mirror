@@ -1,7 +1,7 @@
 /**
  * @file pkce.ts
  * @description
- *   PKCE (RFC 7636) + OIDC state utilities for `@platform/auth-client`.
+ *   PKCE (RFC 7636) + OIDC state utilities for `@agentic-dna/auth-client`.
  *   Ported from auth-provider's `frontend/src/utils/pkce.ts` (the tested,
  *   audited reference implementation — ADR-009 §1 "reuse and generalize").
  *

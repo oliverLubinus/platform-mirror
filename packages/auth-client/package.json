@@ -1,11 +1,11 @@
 {
-  "name": "@platform/auth-client",
+  "name": "@agentic-dna/auth-client",
   "version": "0.1.0",
   "description": "Platform-wide frontend auth SDK: OIDC Authorization Code + PKCE, in-memory tokens, silent refresh (ADR-004 s2, ADR-009 s1, R-PKG-03). Ported from the live auth-provider frontend implementation.",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oliverLubinus/platform.git",
+    "url": "git+https://github.com/Agentic-DNA/platform.git",
     "directory": "packages/auth-client"
   },
   "publishConfig": {

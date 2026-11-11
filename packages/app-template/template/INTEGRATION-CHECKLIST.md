@@ -44,7 +44,7 @@ Interface inventory rows covered: #1 (OIDC client, redirects, origins),
 
 ## 4. Event subscription (row 5 — ADR-016; OPTIONAL)
 
-- [ ] Decision recorded: which lifecycle events (if any) this app subscribes to. Default at skeleton: **none** — revisit when a feature needs user/org lifecycle signals. The consumer template (`createEventConsumer` + `verifyEventSignature`, `@platform/server-core`) is the ONLY way to consume events — never a hand-rolled webhook listener.
+- [ ] Decision recorded: which lifecycle events (if any) this app subscribes to. Default at skeleton: **none** — revisit when a feature needs user/org lifecycle signals. The consumer template (`createEventConsumer` + `verifyEventSignature`, `@agentic-dna/server-core`) is the ONLY way to consume events — never a hand-rolled webhook listener.
 
 ## 5. Metrics / log conventions (row 9 — R-OBS-01…10, ADR-011)
 

@@ -17,15 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The payload consumes @platform/* via link:../platform (pre-registry
+      # The payload consumes @agentic-dna/* via link:../platform (pre-registry
       # interim, T4.3 protocol) - provide the platform sibling checkout.
       # Obsolete once the first registry publish flips deps to ^0.2.0.
       - uses: actions/checkout@v4
         with:
-          repository: oliverLubinus/platform
+          repository: Agentic-DNA/platform
           # Default GITHUB_TOKEN is repo-scoped - it cannot read the platform
           # repo. Each fan-out repo creates its own PLATFORM_REPO_TOKEN
-          # (fine-grained PAT, Contents: read-only on oliverLubinus/platform).
+          # (fine-grained PAT, Contents: read-only on Agentic-DNA/platform).
           token: ${{ secrets.PLATFORM_REPO_TOKEN }}
           path: platform-checkout
           ref: main

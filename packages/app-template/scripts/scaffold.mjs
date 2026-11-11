@@ -61,7 +61,7 @@ walk(dest);
 // workspace containing the platform packages, and the packages are not on
 // any registry yet — `workspace:*` (monorepo form) or `^0.x` (the intended
 // registry form) both fail `pnpm install` immediately. Until the platform
-// packages are published, EVERY @platform/* dep is linked to the platform
+// packages are published, EVERY @agentic-dna/* dep is linked to the platform
 // checkout; when a registry exists, scaffold grows a --registry mode and
 // this rewrite is dropped.
 const packagesRoot = resolve(fileURLToPath(new URL('..', import.meta.url))); // packages/
@@ -69,8 +69,8 @@ const pkgPath = join(dest, 'package.json');
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
 let rewritten = 0;
 for (const [dep, spec] of Object.entries(pkg.dependencies ?? {})) {
-  if (dep.startsWith('@platform/')) {
-    const pkgDir = join(packagesRoot, dep.slice('@platform/'.length));
+  if (dep.startsWith('@agentic-dna/')) {
+    const pkgDir = join(packagesRoot, dep.slice('@agentic-dna/'.length));
     const rel = relative(dest, pkgDir).replaceAll('\\', '/');
     pkg.dependencies[dep] = 'link:' + rel;
     rewritten++;

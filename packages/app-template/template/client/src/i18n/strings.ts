@@ -7,7 +7,7 @@
  */
 export const strings = {
   'app.title': '{{APP_TITLE}}',
-  'app.subtitle': 'Platform app scaffolded from @platform/app-template',
+  'app.subtitle': 'Platform app scaffolded from @agentic-dna/app-template',
   'app.loading': 'Loading…',
 
   'health.checking': 'Checking API health…',

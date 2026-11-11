@@ -1,4 +1,4 @@
-# @platform/server-core
+# @agentic-dna/server-core
 
 Platform-wide backend baseline (ADR-010 extraction; R-PKG-10 copy →
 generalize → test → version). **Ported from the live auth-provider
@@ -13,7 +13,7 @@ implementation** — not re-invented.
 | `events/eventConsumer` | Derived from ADR-016 §3 + R-CHAT-21/22/23/24 | The only platform-conformant consumer; R-CHAT-21: "no hand-rolled consumers" |
 | `config/provider` (secretProvider convention) | `auth-provider/backend/src/config/secretProvider.ts` pattern | ADR-010; R-ENV-03 env-file conventions; Q9: interface is the decision, product deferred |
 | `logging/logger` | `auth-provider/backend/src/shared/logger.ts` | T1.3b; interface + zero-dep impl; ONE redaction via `sanitizeLogMeta`; transport wiring stays app-side |
-| `errors/handler` + `express/adapter` | `auth-provider/backend/src/shared/globalErrorHandler.ts` | T1.3c; classifier core (zero-dep) + `@platform/server-core/express` subpath (types-only, express optional peer) |
+| `errors/handler` + `express/adapter` | `auth-provider/backend/src/shared/globalErrorHandler.ts` | T1.3c; classifier core (zero-dep) + `@agentic-dna/server-core/express` subpath (types-only, express optional peer) |
 | `audit/rowIntegrity` | `auth-provider/backend/src/utils/rowIntegrity.ts` | T1.3d; GDR-2 digests (3-state verify, timing-safe); GENERALIZED: HMAC key injected via factory (config composition is app-side) |
 | `audit/auditLog` + `audit/auditRedaction` | `auth-provider/backend/src/utils/auditLog.ts` + `auditRedaction.ts` | T1.3d; single audit choke point with digest-over-redacted-details, fail-open/closed; GENERALIZED: persistence injected (Prisma stays app-side); redaction regex VERBATIM — boundary semantics pinned in tests |
 | `express/rateLimiter` + `express/securityHeaders` + `express/auth` | `auth-provider/backend/src/shared/RateLimiterNode.ts` + `middleware/securityHeaders.ts` + `utils/auth.ts` | T1.3d; policy wrapper over express-rate-limit ^8.5.1 (optional peer, GDR-4 carried over), H-04 headers verbatim, F-031 header-only token extraction; TokenVerifier contract is spec-first (real JWKS verifier lands with app-template) |
@@ -48,14 +48,14 @@ Verified divergences (each documented in the module's header comment):
 - auth-provider's specific secret inventory — apps declare their own
   (`AppSecretSpec[]`); the engine is here, the inventory is per-app.
 - Transport wiring for the logger (winston + daily rotation) and app route
-  wiring — land with `@platform/app-template` (T1.5). The Express error
-  adapter itself DID land as a types-only subpath (`@platform/server-core/express`)
+  wiring — land with `@agentic-dna/app-template` (T1.5). The Express error
+  adapter itself DID land as a types-only subpath (`@agentic-dna/server-core/express`)
   with express as an optional peer — no runtime dependency enters this package.
 
 ## Usage sketch (new platform backend)
 
 ```ts
-import { ApiError, defineErrorCodeRegistry, loadAppSecrets, createEventConsumer } from '@platform/server-core';
+import { ApiError, defineErrorCodeRegistry, loadAppSecrets, createEventConsumer } from '@agentic-dna/server-core';
 
 // 1. App error codes (platform base map + contributions, collision-checked)
 export const ERROR_CODES = defineErrorCodeRegistry({
@@ -79,5 +79,5 @@ throw new ApiError(ERROR_CODES.PM_PROJECT_NOT_FOUND.code, 'Project not found.', 
 
 - Node ≥ 24 (native TS type-stripping for tests; `tsc` emits `dist/`).
 - Zero runtime dependencies; dev-only: `typescript`, `tsx`, `@types/node`.
-- Tests: `node:test` (`pnpm --filter @platform/server-core test`).
+- Tests: `node:test` (`pnpm --filter @agentic-dna/server-core test`).
 - Versioning: coordinated release train (ADR-012 §2); apps pin majors.

@@ -19,7 +19,7 @@
  *  2. **Transport is injectable, not bundled.** server-core stays zero-dep
  *     (AGENTS.md rule): the default logger writes structured JSON to the
  *     console and to any caller-supplied sinks. The winston + daily-rotate
- *     transport wiring from auth-provider lands in `@platform/app-template`
+ *     transport wiring from auth-provider lands in `@agentic-dna/app-template`
  *     (ops concern), not in this package.
  */
 

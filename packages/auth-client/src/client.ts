@@ -1,7 +1,7 @@
 /**
  * @file client.ts
  * @description
- *   `@platform/auth-client` core — one audited OIDC implementation for every
+ *   `@agentic-dna/auth-client` core — one audited OIDC implementation for every
  *   platform SPA (ADR-009 §1). Framework-agnostic: no React, no Next, no Vite
  *   imports (R-PKG-02); the React adapter (session provider/hooks,
  *   ProtectedRoute, role-gated rendering, "no access" page) is a subpath on

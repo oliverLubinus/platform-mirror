@@ -1,6 +1,6 @@
 name: release
 
-# Release train (ADR-012 §2): coordinated `@platform/*` releases via Changesets.
+# Release train (ADR-012 §2): coordinated `@agentic-dna/*` releases via Changesets.
 #
 # Flow: a PR adds a changeset (`pnpm changeset`) -> merge -> this workflow opens/
 # updates the "Version Packages" PR -> that PR merges -> the same workflow runs
@@ -8,7 +8,7 @@ name: release
 # the registry and pushes the per-package git tags.
 #
 # The job is inert until the repo lives under the account that owns the
-# `@platform` npm scope (ADR-012 resolved 2026-11-06: GitHub Packages requires
+# `@agentic-dna` npm scope (ADR-012 resolved 2026-11-06: GitHub Packages requires
 # scope == owning GitHub account). See docs/release-train.md for the
 # one-time prerequisites and the initial-publish runbook.
 
@@ -24,10 +24,10 @@ permissions:
 jobs:
   release-train:
     # Self-arming guard: runs only once the namespace precondition is met
-    # (repo transferred to the `platform` account). Before that, publishing
-    # `@platform/*` from GitHub Packages is impossible and the job must not
+    # (repo transferred to the Agentic-DNA org). Before that, publishing
+    # `@agentic-dna/*` from GitHub Packages is impossible and the job must not
     # even attempt it.
-    if: github.repository_owner == 'platform'
+    if: github.repository_owner == 'Agentic-DNA'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

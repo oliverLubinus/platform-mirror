@@ -26,7 +26,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Packages' dist/ is gitignored - it must be BUILT before anything can
-      # typecheck against @platform/* types. Order matters: build, then
+      # typecheck against @agentic-dna/* types. Order matters: build, then
       # typecheck, then test. The app-template build generates the Prisma
       # client first (its scripts are self-sufficient).
       - name: Build (packages -> dist, template client bundle)

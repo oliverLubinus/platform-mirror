@@ -6,8 +6,8 @@
   "rangeStrategy": "bump",
   "packageRules": [
     {
-      "description": "@platform/*: in-range minor/patch updates arrive as automated bump PRs; majors (and 0.x minor-as-major) are NEVER auto-merged - they are deliberate, reviewed upgrades per the platform N/N-1 policy.",
-      "matchPackagePatterns": ["^@platform/"],
+      "description": "@agentic-dna/*: in-range minor/patch updates arrive as automated bump PRs; majors (and 0.x minor-as-major) are NEVER auto-merged - they are deliberate, reviewed upgrades per the platform N/N-1 policy.",
+      "matchPackagePatterns": ["^@agentic-dna/"],
       "automerge": false
     }
   ]

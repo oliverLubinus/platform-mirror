@@ -2,7 +2,7 @@
  * @file client/src/auth/authClient.test.ts
  * @description
  *   Consumer-level tests for the template's auth wiring — the FIRST REAL
- *   CONSUMER proof of `@platform/auth-client` (T1.5b). Runs under node:test
+ *   CONSUMER proof of `@agentic-dna/auth-client` (T1.5b). Runs under node:test
  *   (no DOM): the SDK's injected `fetch`/`navigate`/`storage` make the whole
  *   OIDC flow testable without a browser.
  *
@@ -12,7 +12,7 @@
  */
 import { describe, it } from 'node:test';
 import { strictEqual, ok, rejects } from 'node:assert';
-import { memoryStorage } from '@platform/auth-client';
+import { memoryStorage } from '@agentic-dna/auth-client';
 import { createAppAuth, type AppAuthConfig } from './authClient';
 
 const config: AppAuthConfig = {

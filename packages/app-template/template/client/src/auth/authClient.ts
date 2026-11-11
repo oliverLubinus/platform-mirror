@@ -2,7 +2,7 @@
  * @file client/src/auth/authClient.ts
  * @description
  *   The template's auth wiring — the FIRST REAL CONSUMER of
- *   `@platform/auth-client` (T1.5b). Deliberately thin: it owns only the
+ *   `@agentic-dna/auth-client` (T1.5b). Deliberately thin: it owns only the
  *   app-facing state machine (boot / sign-in / sign-out) around the SDK's
  *   framework-agnostic core. Everything learned here feeds the `./react`
  *   adapter design (ADR-020 Phase 2) — see README "First-consumer findings".
@@ -23,7 +23,7 @@ import {
   type AuthClient,
   type AuthClientConfig,
   type AuthSession,
-} from '@platform/auth-client';
+} from '@agentic-dna/auth-client';
 
 export interface AppAuthConfig {
   /** auth-provider API origin (single base URL). */

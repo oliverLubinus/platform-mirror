@@ -1,7 +1,7 @@
 /**
  * @file config.ts
  * @description
- *   Client configuration for `@platform/auth-client` (R-PKG-03).
+ *   Client configuration for `@agentic-dna/auth-client` (R-PKG-03).
  *
  *   All endpoints derive from ONE base URL: auth-provider's API origin
  *   (`auth-api.<env>.agentic-dna.cloud`) — the same origin that serves

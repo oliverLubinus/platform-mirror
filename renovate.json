@@ -6,8 +6,8 @@
   "rangeStrategy": "bump",
   "packageRules": [
     {
-      "description": "Platform packages are released via the changesets release train - renovate never touches @platform/* inside this monorepo (workspace sources, not registry deps).",
-      "matchPackagePatterns": ["^@platform/"],
+      "description": "Platform packages are released via the changesets release train - renovate never touches @agentic-dna/* inside this monorepo (workspace sources, not registry deps).",
+      "matchPackagePatterns": ["^@agentic-dna/"],
       "enabled": false
     }
   ]

@@ -7,7 +7,7 @@
  *   REJECTS duplicates. Clients may rely on base codes existing with
  *   their documented statuses; add new codes here as the app grows.
  */
-import { defineErrorCodeRegistry } from '@platform/server-core';
+import { defineErrorCodeRegistry } from '@agentic-dna/server-core';
 
 export const errorCodes = defineErrorCodeRegistry({
   // App-specific codes ONLY — the base map already covers

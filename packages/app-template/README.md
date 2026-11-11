@@ -1,4 +1,4 @@
-# @platform/app-template
+# @agentic-dna/app-template
 
 **Status: T1.5 COMPLETE (skeleton + consumers + verifier/CI/guardrails + AGENTS.md harness + rehearsal — see the build order below).**
 
@@ -8,7 +8,7 @@ The **agent onboarding kit**: the reference scaffold every platform app starts f
 
 | Concern | Mechanism |
 | --- | --- |
-| Error contract | `@platform/server-core` global error handler + platform envelope (`{ error: { code, message, status } }`); app registry extends `PLATFORM_ERROR_CODES` |
+| Error contract | `@agentic-dna/server-core` global error handler + platform envelope (`{ error: { code, message, status } }`); app registry extends `PLATFORM_ERROR_CODES` |
 | Security | H-04 security headers, `no-store` on APIs, rate limiting with envelope 429, `requireAuth` with the **real HS256 verifier** (server-core `createTokenVerifier`: key-ring rotation, alg pinning, iss/aud/exp contract) |
 | Logging hygiene | URLs pass `sanitizeUrlQuery` before any sink; secrets/tokens never logged (R-PKG-08) |
 | Audit | `createAuditLogger` wired at the factory; persistence is injected per app (ADR-011) |
@@ -28,7 +28,7 @@ app-template/
     AGENTS.md          ← the T2.1 implementation harness (mission, requirement-ID map,
                          never-build list, commit-evidence convention, escalation rule)
   scripts/scaffold.mjs ← copy + rename placeholders ({{APP_SLUG}}, {{APP_TITLE}});
-                         links @platform/* deps to the platform checkout (registry pending)
+                         links @agentic-dna/* deps to the platform checkout (registry pending)
   scripts/rehearse-onboarding.mjs ← scripted T1.5d DoD proof: fresh app scaffolds
                          + CI-equivalent checks green (minutes, not a workday)
 ```
@@ -37,7 +37,7 @@ The payload lives under `template/` so the scaffold procedure is explicit and te
 
 ## First-consumer findings (ADR-020 Phase 2 feedback)
 
-T1.5b made this template the first real consumer of `@platform/auth-client`.
+T1.5b made this template the first real consumer of `@agentic-dna/auth-client`.
 The findings below are the adapter-design input for the `./react` subpath —
 each one is pinned by a test in `template/client/src/auth/authClient.test.ts`.
 
@@ -104,4 +104,4 @@ requirements registry, each with its governing artifact and proving gate).
 
 ## Development (inside the platform monorepo)
 
-The template is a normal workspace package while it evolves: `pnpm --filter @platform/app-template typecheck|test|build`. Server unit tests are DB-free by design (lazy Prisma import + injected store); DB-backed integration tests arrive with the contract CI job. Run the local guardrails: `pnpm check:quality-gate` (whitespace, tokens, contrast, layering, lint, typecheck, tests, build, bundle-secret scan) and `pnpm hooks:install` for the pre-commit fast path.
+The template is a normal workspace package while it evolves: `pnpm --filter @agentic-dna/app-template typecheck|test|build`. Server unit tests are DB-free by design (lazy Prisma import + injected store); DB-backed integration tests arrive with the contract CI job. Run the local guardrails: `pnpm check:quality-gate` (whitespace, tokens, contrast, layering, lint, typecheck, tests, build, bundle-secret scan) and `pnpm hooks:install` for the pre-commit fast path.

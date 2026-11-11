@@ -1,7 +1,7 @@
 /**
  * @file errors.ts
  * @description
- *   Typed errors for `@platform/auth-client` (R-PKG-03).
+ *   Typed errors for `@agentic-dna/auth-client` (R-PKG-03).
  *
  *   Message discipline (R-PKG-03 hard rule "no secrets/tokens in logs"):
  *   - error messages are curated strings; they never interpolate protocol

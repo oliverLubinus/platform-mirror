@@ -27,14 +27,14 @@ import {
   createTokenVerifier,
   sanitizeUrlQuery,
   type Logger,
-} from '@platform/server-core';
+} from '@agentic-dna/server-core';
 import {
   createRateLimiter,
   globalErrorHandler,
   noStore,
   requireAuth,
   securityHeaders,
-} from '@platform/server-core/express';
+} from '@agentic-dna/server-core/express';
 import type { AppConfig } from './config.js';
 import { errorCodes } from './errors/errorCodes.js';
 import { routeManifest, type RouteSpec } from './routes.js';

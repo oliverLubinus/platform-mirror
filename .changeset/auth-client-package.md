@@ -1,8 +1,8 @@
 ---
-'@platform/auth-client': minor
+'@agentic-dna/auth-client': minor
 ---
 
-New `@platform/auth-client` package (T1.4 / ADR-009 §1): one audited OIDC client for all platform SPAs.
+New `@agentic-dna/auth-client` package (T1.4 / ADR-009 §1): one audited OIDC client for all platform SPAs.
 
 - Authorization Code + PKCE S256 against auth-provider's hosted login UI (`/auth/authorize` → callback → `/auth/token` exchange); the SDK never renders login screens (R-PKG-04) and holds no secrets — public client only (R-PKG-03).
 - Tokens (access/refresh/ID) live in memory only — structurally enforced: the package source has no localStorage access, no direct sessionStorage calls outside the non-token flow-state adapter, and no `console.*` (sourceRules test).

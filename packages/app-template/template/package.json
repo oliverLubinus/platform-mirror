@@ -3,7 +3,7 @@
   "packageManager": "pnpm@12.18.0",
   "version": "0.1.0",
   "private": true,
-  "description": "{{APP_TITLE}} — platform app scaffolded from @platform/app-template (R-PKG-09).",
+  "description": "{{APP_TITLE}} — platform app scaffolded from @agentic-dna/app-template (R-PKG-09).",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -31,8 +31,8 @@
     "db:seed": "node --env-file-if-exists=.env --import tsx server/prisma/seed.ts"
   },
   "dependencies": {
-    "@platform/auth-client": "^0.2.0",
-    "@platform/server-core": "^0.2.0",
+    "@agentic-dna/auth-client": "^0.2.0",
+    "@agentic-dna/server-core": "^0.2.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.1",
     "express": "^5.1.0",

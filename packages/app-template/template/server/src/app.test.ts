@@ -17,7 +17,7 @@ import express from 'express';
 import request from 'supertest';
 import { type AppConfig } from './config.js';
 import { createApp } from './app.js';
-import { createTokenVerifier } from '@platform/server-core';
+import { createTokenVerifier } from '@agentic-dna/server-core';
 import type { NotesStore } from './routes/notes.js';
 
 const config: AppConfig = {

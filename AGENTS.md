@@ -5,7 +5,7 @@ binding; violating them is a review-rejection, not a style nit.
 
 ## Mission
 
-Shared packages (`@platform/*`) and shared infra config for the
+Shared packages (`@agentic-dna/*`) and shared infra config for the
 agentic-dna platform. Structure and governance per ADR-012
 (`../architecture/design-decisions/ADR-012-governance-repos-deployment.md`).
 
@@ -37,7 +37,7 @@ agentic-dna platform. Structure and governance per ADR-012
    (R-PKG-*, ADR-0xx) in commit messages and PR descriptions — the
    evidence-based-history convention used across all platform repos.
 2. Tests are mandatory for every exported function and every security
-   property (`node:test`; run `pnpm --filter @platform/server-core test`).
+   property (`node:test`; run `pnpm --filter @agentic-dna/server-core test`).
 3. Contract-affecting changes (integration contract, ADR-016 envelope,
    error envelope) → update `definitions/interface-inventory.md` in the
    architecture repo in the same pass (backlog item 15 rule).

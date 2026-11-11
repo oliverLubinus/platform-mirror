@@ -19,7 +19,7 @@ import { ok, strictEqual } from 'node:assert';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PLATFORM_ERROR_CODES } from '@platform/server-core';
+import { PLATFORM_ERROR_CODES } from '@agentic-dna/server-core';
 import { errorCodes } from './errors/errorCodes.js';
 
 const here = join(fileURLToPath(import.meta.url), '..');

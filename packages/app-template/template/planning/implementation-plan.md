@@ -24,7 +24,7 @@ cites the requirement IDs it implements and the milestone it advances.
 
 ## Platform dependencies
 
-- Registry publish status: apps consume `@platform/*` via the release train;
+- Registry publish status: apps consume `@agentic-dna/*` via the release train;
   `link:` is only the pre-publish interim.
 - OIDC client registration: INTEGRATION-CHECKLIST.md §1 (PENDING rows stay
   visible — absence is explicit).

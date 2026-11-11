@@ -1,7 +1,7 @@
 /**
  * Express adapter for the platform error classifier (T1.3c).
  *
- * Import via the `@platform/server-core/express` subpath. This module has
+ * Import via the `@agentic-dna/server-core/express` subpath. This module has
  * NO express runtime dependency — it only uses express types (consumers
  * already have express; `@types/express` is a dev-time concern for this
  * package). The middleware delegates every decision to `classifyError`

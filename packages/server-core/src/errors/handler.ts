@@ -6,7 +6,7 @@
  * thrown value and request context, it decides the HTTP status, the log
  * level, the client response body (platform envelope, integration contract
  * §3) and the server-side log payload. The Express adapter lives in
- * `src/express/adapter.ts` (`@platform/server-core/express` subpath).
+ * `src/express/adapter.ts` (`@agentic-dna/server-core/express` subpath).
  *
  * Ported branch logic (auth-provider's four shapes):
  *   1. `ApiError` instance — structured, full context

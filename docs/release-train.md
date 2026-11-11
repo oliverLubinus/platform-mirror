@@ -1,34 +1,38 @@
-# Release train — publishing & consuming `@platform/*` packages
+# Release train — publishing & consuming `@agentic-dna/*` packages
 
-How `@platform/*` packages are versioned, published, and consumed
+How `@agentic-dna/*` packages are versioned, published, and consumed
 (ADR-012 §2: coordinated releases — one train for all packages, changelog
 per release, breaking changes require a major bump + decision-record
 reference).
 
 ## One-time prerequisites (owner actions)
 
-1. **Register the GitHub org `platform` and transfer this repo into it.**
+1. **Transfer this repo into the `Agentic-DNA` org** (RESOLVED 2026-11-10).
 
    GitHub Packages' npm registry requires the npm scope to equal the GitHub
-   account that owns the publishing repo. `@platform/*` can therefore only be
-   published from an account literally named `platform` (constraint + decision
-   recorded in ADR-012, resolved 2026-11-06; the account was unregistered at
-   the time of writing — `api.github.com/users/platform` → 404).
+   account that owns the publishing repo. The owner registered **Agentic-DNA**
+   already and chose it over registering a new org named `platform` — so per
+   ADR-012's fallback rule the npm scope was renamed corpus-wide
+   `@platform/*` → `@agentic-dna/*` in one pass (2026-11-10, before the
+   first publish; zero packages published, zero consumers — the cheap
+   window). npm scopes are lowercase; GitHub Packages matches the scope to
+   the owner login case-insensitively (`@agentic-dna` ↔ org `Agentic-DNA`).
 
    Until the transfer, `.github/workflows/release.yml` is a deliberate no-op
-   (`repository_owner == 'platform'` guard) and nothing can publish.
+   (`repository_owner == 'Agentic-DNA'` guard) and nothing can publish.
 
    - Transfer notes: Actions secrets/variables and branch protection carry
      over with the repo; re-verify branch protection after the transfer and
      update local remotes (old URLs redirect).
-   - **Fallback rule** (if `platform` turns out to be unavailable/reserved):
-     decide the final org name first, then rename the npm scope corpus-wide
-     in the same pass (ADRs, requirements, package manifests, imports).
-     Zero packages are published and zero consumers exist today, so the
-     rename is cheap now and a breaking change after the first publish.
-     Do NOT fall back to a personal-account scope (`@oliverlubinus/*`) or
-     per-dependency `npm:` alias shims — both couple every app to a personal
-     account and turn any later org move into a breaking rename.
+   - **Consumer PATs are owner-bound:** fine-grained tokens issued against
+     the old owner stop working at the transfer — re-issue against
+     `Agentic-DNA` and update consuming repos' secrets (PM's
+     `PLATFORM_REPO_TOKEN`) in the same maintenance window.
+   - **Doctrine (unchanged):** never fall back to a personal-account scope
+     (`@oliverlubinus/*`) or per-dependency `npm:` alias shims — both couple
+     every app to a personal account and turn any later org move into a
+     breaking rename. The scope↔owner rename window closes at the first
+     publish.
 2. **Org workflow permissions:** allow GitHub Actions read/write. The
    release workflow declares `packages: write` + `contents: write`, so the
    workflow's `GITHUB_TOKEN` is a valid publish credential — no PAT
@@ -41,7 +45,7 @@ reference).
 - Every PR that should change a package version adds a changeset:
   `pnpm changeset` → commit the generated `.changeset/*.md` with the PR.
 - Merge to `main` → `release.yml` opens/updates the **Version Packages** PR.
-  All `@platform/*` versions move together (`fixed` grouping in
+  All `@agentic-dna/*` versions move together (`fixed` grouping in
   `.changeset/config.json` — one train, ADR-012 §2) with a generated
   changelog.
 - Merge that PR → `release.yml` re-runs the CI gates (typecheck/test/build)
@@ -67,13 +71,13 @@ reference).
 
 ## Consuming (app repos)
 
-`pnpm add @platform/server-core` resolves from GitHub Packages once:
+`pnpm add @agentic-dna/server-core` resolves from GitHub Packages once:
 
 1. The app repo carries a committed `.npmrc` with the scope mapping and the
    env-var token reference (no token value in the repo):
 
    ```
-   @platform:registry=https://npm.pkg.github.com
+   @agentic-dna:registry=https://npm.pkg.github.com
    //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
    ```
 
@@ -95,7 +99,8 @@ reference).
 ## Guard-rails
 
 - **Scope == owner account.** The npm scope and the owning GitHub account
-  change together or not at all (ADR-012, 2026-11-06).
+  change together or not at all (ADR-012, 2026-11-06). The scope is always
+  lowercase; owner logins may be mixed-case (`@agentic-dna` ↔ `Agentic-DNA`).
 - **Publishable manifests:** no `workspace:` protocol ranges (the publish
   step is npm-based and cannot resolve them — peerDependencies carry real
   semver ranges), no `private: true`, and `repository.url` must match the

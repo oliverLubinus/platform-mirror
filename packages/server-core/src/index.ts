@@ -1,5 +1,5 @@
 /**
- * @platform/server-core — platform backend baseline (ADR-010 extraction).
+ * @agentic-dna/server-core — platform backend baseline (ADR-010 extraction).
  *
  * Ported from the live auth-provider implementation (R-PKG-10: copy →
  * generalize → test → version). LLM-specific mappings stay app-side.
@@ -50,7 +50,7 @@ export { createLogger } from './logging/logger.js';
 export type { Logger, LogLevel, LogMeta, StructuredLogEvent, LoggerOptions } from './logging/logger.js';
 
 // Error classifier core (T1.3c) — the Express adapter lives at the
-// `@platform/server-core/express` subpath, NOT in this barrel.
+// `@agentic-dna/server-core/express` subpath, NOT in this barrel.
 export { classifyError, sanitizeDetailsForClient } from './errors/handler.js';
 export type { ErrorHandlerContext, ErrorClassification } from './errors/handler.js';
 
