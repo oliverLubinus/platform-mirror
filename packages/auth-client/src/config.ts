@@ -114,7 +114,15 @@ export function resolveAuthClientConfig(config: AuthClientConfig): ResolvedAuthC
     skewSeconds: config.skewSeconds ?? 30,
     storage: config.storage ?? defaultStorage(),
     navigate: config.navigate ?? defaultNavigate,
-    fetchImpl: config.fetchImpl ?? fetch,
+    // Bound AT CONFIG TIME: the SDK invokes fetchImpl method-style
+    // (`cfg.fetchImpl(...)`), and in a browser the native fetch requires the
+    // global receiver — an unbound global fetch throws "Illegal invocation"
+    // in strict-mode ESM (first consumer: PM pilot A2, 2026-11-11, worked
+    // around app-side with fetchImpl: fetch.bind(globalThis) until this fix;
+    // regression guards: config.test.ts). Binding here covers BOTH the
+    // default and injected implementations — the SDK's invocation stays
+    // receiver-independent.
+    fetchImpl: (config.fetchImpl ?? fetch).bind(globalThis),
     now: config.now ?? Date.now,
     authorizeUrl: `${base}/auth/authorize`,
     tokenUrl: `${base}/auth/token`,
@@ -123,5 +131,3 @@ export function resolveAuthClientConfig(config: AuthClientConfig): ResolvedAuthC
     csrfTokenUrl: `${base}/api/csrf-token`,
   };
 }
-
-
