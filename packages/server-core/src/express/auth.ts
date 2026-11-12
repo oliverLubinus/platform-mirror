@@ -109,8 +109,16 @@ export function requireAuth(options: RequireAuthOptions = {}): (req: Request, re
       }
       try {
         const claims = await verify(token);
+        // Subject normalization (PM B5 upstream finding, regression-guarded in
+        // auth.test.ts): the contract above documents the subject as
+        // "attached as req.user.id", but the implementation attached the raw
+        // claims — getUserId (which reads req.user.id) was undefined for
+        // EVERY verified request. The verified sub is now normalized to id
+        // at this single choke point; sub itself is preserved verbatim.
+        // A token-level `id` claim (untrusted if present) is overridden by
+        // the verified sub — id is always authoritative-from-sub.
         // Local cast — no global Express augmentation (see getUserId).
-        (req as { user?: unknown }).user = claims;
+        (req as { user?: unknown }).user = { ...claims, id: claims.sub };
         next();
       } catch {
         // Fail closed, no reason leakage: same body for all rejection causes.

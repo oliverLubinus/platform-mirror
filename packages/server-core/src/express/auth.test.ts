@@ -105,7 +105,7 @@ describe('requireAuth (Express middleware — envelope via res.status(401).json)
     })(req, res as never, () => (nextCalled = true));
     await new Promise((r) => setTimeout(r, 5));
     strictEqual(nextCalled, true);
-    deepStrictEqual((req as unknown as { user?: unknown }).user, { sub: 'u1', scope: 'read' });
+    deepStrictEqual((req as unknown as { user?: unknown }).user, { sub: 'u1', scope: 'read', id: 'u1' });
     strictEqual(state.statusCode, undefined);
   });
 
@@ -132,6 +132,53 @@ describe('requireAuth (Express middleware — envelope via res.status(401).json)
     await new Promise((r) => setTimeout(r, 5));
     strictEqual(state.statusCode, 401);
     strictEqual(nextCalled, false);
+  });
+});
+
+describe('requireAuth subject normalization (PM B5 upstream finding — regression guards)', () => {
+  /** Drives the middleware against mocks and awaits its async body. */
+  async function drive(req: Request, res: unknown, next: () => void, verify: (token: string) => Promise<{ sub: string; [claim: string]: unknown }>) {
+    requireAuth({ verify })(req, res as never, next);
+    await new Promise((r) => setTimeout(r, 5));
+  }
+
+  it('getUserId resolves after requireAuth — the contract "sub attached as req.user.id" actually holds', async () => {
+    let nextCalled = false;
+    const { state, res } = mockRes();
+    const req = mockReq({ authorization: 'Bearer tok' });
+    await drive(req, res, () => (nextCalled = true), async () => ({ sub: 'subject-1', scope: 'read' }));
+    strictEqual(nextCalled, true);
+    // THE fix: getUserId reads req.user.id — it was undefined for every
+    // verified request before normalization (PM B5 audit rows would have
+    // carried no real subject).
+    strictEqual(getUserId(req as never), 'subject-1');
+    strictEqual(getUserIdOrThrow(req as never), 'subject-1');
+    strictEqual(state.statusCode, undefined);
+  });
+
+  it('a token-level id claim (untrusted) is overridden by the verified sub — id is always authoritative-from-sub', async () => {
+    let nextCalled = false;
+    const { state, res } = mockRes();
+    const req = mockReq({ authorization: 'Bearer tok' });
+    await drive(req, res, () => (nextCalled = true), async () => ({ sub: 'u1', id: 'forged' }));
+    strictEqual(nextCalled, true);
+    strictEqual(getUserId(req as never), 'u1');
+    strictEqual(getUserIdOrThrow(req as never), 'u1');
+    strictEqual(state.statusCode, undefined);
+  });
+
+  it('normalization loses no claims — sub and app claims ride alongside id', async () => {
+    let nextCalled = false;
+    const { state, res } = mockRes();
+    const req = mockReq({ authorization: 'Bearer tok' });
+    await drive(req, res, () => (nextCalled = true), async () => ({ sub: 'u1', scope: 'read', amr: ['pwd'] }));
+    strictEqual(nextCalled, true);
+    const user = (req as unknown as { user?: Record<string, unknown> }).user as Record<string, unknown>;
+    strictEqual(user.id, 'u1');
+    strictEqual(user.sub, 'u1');
+    strictEqual(user.scope, 'read');
+    deepStrictEqual(user.amr, ['pwd']);
+    strictEqual(state.statusCode, undefined);
   });
 });
 
