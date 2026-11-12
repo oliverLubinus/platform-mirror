@@ -8,6 +8,7 @@
   "scripts": {
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:infra": "node --test infra/gateway/csp/check-origin-drift.test.mjs",
     "build": "pnpm -r build",
     "changeset": "changeset",
     "version-packages": "changeset version",

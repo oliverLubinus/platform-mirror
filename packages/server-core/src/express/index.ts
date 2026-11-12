@@ -16,6 +16,10 @@ export type { GlobalErrorHandlerOptions } from './adapter.js';
 export { createRateLimiter, rateLimitHandler } from './rateLimiter.js';
 export type { RateLimiterConfig } from './rateLimiter.js';
 
+// CSP violation-report drain (ADR-021 §3) — report-uri endpoint middleware.
+export { cspReportHandler } from './cspReport.js';
+export type { CspReportHandlerOptions } from './cspReport.js';
+
 // Security headers (T1.3d) — ported verbatim from auth-provider H-04.
 export { securityHeaders, noStore } from './securityHeaders.js';
 
