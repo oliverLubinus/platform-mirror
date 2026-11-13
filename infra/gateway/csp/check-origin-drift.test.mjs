@@ -9,8 +9,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 
-const GUARD = new URL('./check-origin-drift.mjs', import.meta.url).pathname;
-const TEMPLATE = new URL('./vhost-csp-report-only.inc', import.meta.url).pathname;
+// fileURLToPath (not .pathname): .pathname yields "/C:/..." on Windows and
+// readFileSync throws ENOENT — found live on the owner's Windows dev machine
+// during the 2d87f36 review landing (the VPS/CI never saw it).
+import { fileURLToPath } from 'node:url';
+const GUARD = fileURLToPath(new URL('./check-origin-drift.mjs', import.meta.url));
+const TEMPLATE = fileURLToPath(new URL('./vhost-csp-report-only.inc', import.meta.url));
 const WORK = mkdtempSync(join(tmpdir(), 'csp-guard-'));
 
 function runGuard(vhost, manifest, args) {
