@@ -1,6 +1,6 @@
 {
   "name": "@agentic-dna/app-template",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "The agent onboarding kit: Vite + TS + React 19 client, Express + Prisma + PostgreSQL server, @agentic-dna/server-core pre-wired (R-PKG-09). Scaffold a new app from this template; this manifest is renamed by scripts/scaffold.mjs.",
   "license": "UNLICENSED",
