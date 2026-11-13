@@ -1,6 +1,6 @@
 {
   "name": "@agentic-dna/auth-client",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Platform-wide frontend auth SDK: OIDC Authorization Code + PKCE, in-memory tokens, silent refresh (ADR-004 s2, ADR-009 s1, R-PKG-03). Ported from the live auth-provider frontend implementation.",
   "license": "UNLICENSED",
   "repository": {

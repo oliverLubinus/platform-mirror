@@ -1,5 +1,13 @@
 # @agentic-dna/app-template
 
+## 0.3.0
+
+### Patch Changes
+
+- Updated dependencies [c983a5f]
+  - @agentic-dna/server-core@0.3.0
+  - @agentic-dna/auth-client@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes
