@@ -52,10 +52,34 @@ if (!Array.isArray(registered) || registered.length === 0) {
   fail(`manifest has no origin list for app="${app}" env="${env}"`);
 }
 
-// collect all connect-src values across CSP headers in the vhost
+// collect all connect-src values across CSP headers in the vhost.
+//
+// nginx variable indirection (2026-11-13): real vhosts build long CSP
+// strings once via `set $csp "..."` and reference them in add_header
+// (`add_header Content-Security-Policy $csp always;`) — often one level
+// deep (`$csp` itself embedding `$csp_connect_src`). The guard must resolve
+// this or it fails closed on the very pattern the vhost templates use.
+// Resolution: collect `set $name "..."` definitions, then expand $refs in
+// each header value to a fixed depth (nginx config is not recursive by
+// intent here; 4 levels is generous headroom).
+const setRe = /set\s+\$([A-Za-z_][A-Za-z0-9_]*)\s+"([^"]*)"\s*;/g;
+const setVars = new Map();
+for (const [, name, value] of vhostText.matchAll(setRe)) {
+  setVars.set(`$${name}`, value);
+}
+
+function expandVars(text, depth = 0) {
+  if (depth > 4) return text; // bounded; a deeper chain is pathological
+  return text.replace(/\$[A-Za-z_][A-Za-z0-9_]*/g, (ref) => {
+    const resolved = setVars.get(ref);
+    return resolved !== undefined ? expandVars(resolved, depth + 1) : ref;
+  });
+}
+
 const connects = [];
-const headerRe = /Content-Security-Policy(?:-Report-Only)?\s+"([^"]*)"/g;
-for (const [, csp] of vhostText.matchAll(headerRe)) {
+const headerRe = /Content-Security-Policy(?:-Report-Only)?\s+"([^"]*)"|\badd_header\s+Content-Security-Policy(?:-Report-Only)?\s+(\$[A-Za-z_][A-Za-z0-9_]*)/g;
+for (const [, literal, varRef] of vhostText.matchAll(headerRe)) {
+  const csp = literal !== undefined ? literal : expandVars(varRef ?? '');
   for (const directive of csp.split(';')) {
     const trimmed = directive.trim();
     if (trimmed.startsWith('connect-src')) {
