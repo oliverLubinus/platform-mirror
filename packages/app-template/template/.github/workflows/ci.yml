@@ -1,6 +1,6 @@
-# The template app repo CI — mirrors the platform gates (typecheck/test/build).
+# The {{APP_TITLE}} repo CI — mirrors the platform gates (typecheck/test/build).
 # Contract-first OpenAPI drift gate, permission-catalog check, and the
-# pre-commit quality suite land with T1.5c (R-PKG-11, ADR-007).
+# pre-commit quality suite are live from the scaffold (R-PKG-09/R-PKG-11).
 name: ci
 
 on:
@@ -17,22 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The payload consumes @agentic-dna/* via link:../platform (pre-registry
-      # interim, T4.3 protocol) - provide the platform sibling checkout.
-      # Obsolete once the first registry publish flips deps to ^0.2.0.
-      - uses: actions/checkout@v4
-        with:
-          repository: Agentic-DNA/platform
-          # Default GITHUB_TOKEN is repo-scoped - it cannot read the platform
-          # repo. Each fan-out repo creates its own PLATFORM_REPO_TOKEN
-          # (fine-grained PAT, Contents: read-only on Agentic-DNA/platform).
-          token: ${{ secrets.PLATFORM_REPO_TOKEN }}
-          path: platform-checkout
-          ref: main
-
-      - name: "Provide the platform sibling (link: resolution target)"
-        run: ln -s "$GITHUB_WORKSPACE/platform-checkout" ../platform
-
+      # M1 registry flip: @agentic-dna/* resolves from npm.pkg.github.com
+      # (see .npmrc) — the lockfile pins GitHub Packages tarball URLs, so the
+      # install needs a read token. No platform-sibling checkout, no link:.
       - uses: pnpm/action-setup@v4
         # version resolved from package.json "packageManager"
 
@@ -41,9 +28,16 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      # dist/ is gitignored: build the sibling BEFORE the app install/typecheck
-      - name: "Build the platform sibling (types come from its dist/, which is not committed)"
-        run: cd ../platform && pnpm install --frozen-lockfile && pnpm -r build
+      # GitHub Packages auth for @agentic-dna/* (lockfile pins npm.pkg.github.com
+      # tarballs). pnpm IGNORES env-expanded credentials in the repo .npmrc
+      # (supply-chain hardening), so the token goes into the user-level
+      # ~/.npmrc, which is trusted. PACKAGES_READ_TOKEN = fine-grained PAT
+      # with read:packages (owner-created); falls back to the workflow's own
+      # GITHUB_TOKEN.
+      - name: "Configure GitHub Packages auth (user-level ~/.npmrc)"
+        run: printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
@@ -54,5 +48,13 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Build
+      # The jsxDEV lesson (documented in the platform skill + PM runbook):
+      # Vite's isProduction follows process.env.NODE_ENV, not build mode — an
+      # unset NODE_ENV silently emits a dev-JSX bundle that crashes at load.
+      - name: Build (NODE_ENV=production forced)
         run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: Bundle-secret scan (post-build)
+        run: pnpm check:bundle-secrets

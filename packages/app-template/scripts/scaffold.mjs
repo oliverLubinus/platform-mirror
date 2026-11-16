@@ -4,8 +4,14 @@
  *
  *   node scripts/scaffold.mjs --name my-app --title "My App" --target ../my-app
  *
- * Copies template/ to the target, rewrites the {{APP_SLUG}} / {{APP_TITLE}}
- * placeholders, and prints the next steps. The platform repo stays untouched.
+ * Copies template/ to the target, rewrites the {{APP_SLUG}} /
+ * {{APP_SLUG_UPPER}} / {{APP_TITLE}} placeholders, and prints the next steps.
+ * The platform repo stays untouched.
+ *
+ * Platform deps default to REGISTRY resolution (M1 flip: @agentic-dna/*
+ * publishes to GitHub Packages; the template manifest ships caret specs).
+ * `--link` preserves the legacy pre-registry behavior for template
+ * development against a local platform sibling checkout.
  */
 import { cpSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
@@ -21,7 +27,7 @@ function arg(flag) {
 const name = arg('--name');
 const target = arg('--target');
 if (!name || !target) {
-  console.error('usage: node scripts/scaffold.mjs --name <slug> --target <dir> [--title "Title"]');
+  console.error('usage: node scripts/scaffold.mjs --name <slug> --target <dir> [--title "Title"] [--link]');
   process.exit(1);
 }
 const title = arg('--title') ?? name;
@@ -52,33 +58,42 @@ function walk(dir) {
     const ext = entry.slice(entry.lastIndexOf('.'));
     if (!textExts.has(ext) && !entry.startsWith('.env')) continue;
     const content = readFileSync(full, 'utf8');
-    writeFileSync(full, content.replaceAll('{{APP_SLUG}}', slug).replaceAll('{{APP_TITLE}}', title));
+    writeFileSync(full, content
+      .replaceAll('{{APP_SLUG_UPPER}}', slug.toUpperCase())
+      .replaceAll('{{APP_SLUG}}', slug)
+      .replaceAll('{{APP_TITLE}}', title));
   }
 }
 walk(dest);
 
-// Rewrite platform deps to link: paths. A fresh app repo is NOT a pnpm
-// workspace containing the platform packages, and the packages are not on
-// any registry yet — `workspace:*` (monorepo form) or `^0.x` (the intended
-// registry form) both fail `pnpm install` immediately. Until the platform
-// packages are published, EVERY @agentic-dna/* dep is linked to the platform
-// checkout; when a registry exists, scaffold grows a --registry mode and
-// this rewrite is dropped.
+// Platform deps: REGISTRY mode by default (M1 flip) — the template manifest
+// ships caret ^0.x specs that resolve from npm.pkg.github.com; auth comes
+// from the user-level ~/.npmrc (never a committed token). `--link` keeps the
+// legacy behavior for template development against a local platform sibling
+// checkout.
 const packagesRoot = resolve(fileURLToPath(new URL('..', import.meta.url))); // packages/
-const pkgPath = join(dest, 'package.json');
-const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+const useLink = args.includes('--link');
 let rewritten = 0;
-for (const [dep, spec] of Object.entries(pkg.dependencies ?? {})) {
-  if (dep.startsWith('@agentic-dna/')) {
-    const pkgDir = join(packagesRoot, dep.slice('@agentic-dna/'.length));
-    const rel = relative(dest, pkgDir).replaceAll('\\', '/');
-    pkg.dependencies[dep] = 'link:' + rel;
-    rewritten++;
+if (useLink) {
+  const pkgPath = join(dest, 'package.json');
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  for (const [dep, spec] of Object.entries(pkg.dependencies ?? {})) {
+    if (dep.startsWith('@agentic-dna/')) {
+      const pkgDir = join(packagesRoot, dep.slice('@agentic-dna/'.length));
+      const rel = relative(dest, pkgDir).replaceAll('\\', '/');
+      pkg.dependencies[dep] = 'link:' + rel;
+      rewritten++;
+    }
   }
+  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 }
-writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
-console.log(`scaffolded ${slug} -> ${dest} (${rewritten} platform dep(s) linked)`);
+console.log(`scaffolded ${slug} -> ${dest}`);
+if (useLink) {
+  console.log(`  ${rewritten} platform dep(s) linked to the platform checkout (--link mode)`);
+} else {
+  console.log('  @agentic-dna/* deps resolve from npm.pkg.github.com (registry mode; token in user-level ~/.npmrc)');
+}
 console.log('next steps:');
 console.log('  cd ' + dest);
 console.log('  git init && pnpm install');
